@@ -4,13 +4,23 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.edge.EdgeDriver
+import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxOptions
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import java.time.Duration
 
 private fun scrapeWebsite(url: String, cssSelector: String): String {
-    val driver: WebDriver = EdgeDriver()
+    val options = FirefoxOptions()
+    // Execute the browser without UI
+    options.addArguments("--headless")
+    // Execute the browser without security
+    options.addArguments("--no-sandbox")
+    // Execute the browser without shared memory
+    options.addArguments("--disable-dev-shm-usage")
+
+    val driver: WebDriver = FirefoxDriver(options)
+
     return try {
         driver.get(url)
 
