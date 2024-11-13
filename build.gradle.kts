@@ -14,6 +14,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.2")
     implementation("org.telegram:telegrambots:6.9.7.1")
+    implementation("org.seleniumhq.selenium:selenium-java:4.26.0")
     implementation("org.jsoup:jsoup:1.18.1")
 }
 
