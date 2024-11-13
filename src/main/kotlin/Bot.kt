@@ -19,10 +19,10 @@ class Bot : TelegramLongPollingBot() {
 
     override fun onUpdateReceived(update: Update?) {
         if (update!!.hasMessage() && update.message.hasText()) {
-            var messageText = update.message.text
-            var chatId = update.message.chatId
+            val messageText = update.message.text
+            val chatId = update.message.chatId
 
-            var message = SendMessage()
+            val message = SendMessage()
             message.setChatId(chatId)
             message.text = "Received message: $messageText"
 
