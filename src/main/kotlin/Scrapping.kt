@@ -32,14 +32,14 @@ fun scrappingInkaFarma(url: String) {
     driver.get(url)
 
     val wait = WebDriverWait(driver, Duration.ofSeconds(30))
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector()))
+    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.col-xs-5.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount")))
 
     val doc: Document = Jsoup.parse(driver.pageSource!!)
 
     driver.quit()
 
     try {
-        val element = doc.select()[0]
+        val element = doc.select("div.col-xs-5.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount")[1]
         println(element.text())
     } catch (e: IndexOutOfBoundsException) {
         println("Element not found")
