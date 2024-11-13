@@ -24,7 +24,13 @@ class Bot : TelegramLongPollingBot() {
 
             val message = SendMessage()
             message.setChatId(chatId)
-            message.text = "Received message: $messageText"
+            if (messageText.contains("mifarma.com")) {
+                message.text = scrappingMifarma(messageText)
+            } else if (messageText.contains("inkafarma.pe")) {
+                message.text = scrappingInkaFarma(messageText)
+            } else {
+                message.text = "The URL is not from Mifarma or Inkafarma"
+            }
 
             execute(message)
         }
