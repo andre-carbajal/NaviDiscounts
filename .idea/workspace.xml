@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="847db1fa-059b-4375-9c7b-90e517119c52" name="Changes" comment="jvm version changed to 17">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="847db1fa-059b-4375-9c7b-90e517119c52" name="Changes" comment="Update scraping logic to handle potential element index issues.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/Bot.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/Bot.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/Main.kt" afterDir="false" />
@@ -82,7 +81,7 @@
     "project.structure.last.edited": "SDKs",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.40344828",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
+    "settings.editor.selected.configurable": "project.kotlinCompiler",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -124,7 +123,7 @@
     </recent_temporary>
   </component>
   <component name="SeleniumInternalSettingsState">
-    <option name="lastUrl" value="https://www.mifarma.com.pe/producto/pack-bioderma-limpieza-y-proteccion/PACKDB51" />
+    <option name="lastUrl" value="https://inkafarma.pe/producto/gel-hidratante-facial-hydro-boost-neutrogena/011592" />
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -147,6 +146,8 @@
       <workItem from="1731492560479" duration="1165000" />
       <workItem from="1731510374179" duration="60000" />
       <workItem from="1731510462656" duration="3675000" />
+      <workItem from="1731526395976" duration="94000" />
+      <workItem from="1731526516071" duration="2555000" />
     </task>
     <task id="LOCAL-00001" summary="jvm version changed to 17">
       <option name="closed" value="true" />
@@ -156,7 +157,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731468856219</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Update scraping logic to handle potential element index issues.">
+      <option name="closed" value="true" />
+      <created>1731527729311</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1731527729311</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -164,6 +173,11 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="jvm version changed to 17" />
-    <option name="LAST_COMMIT_MESSAGE" value="jvm version changed to 17" />
+    <MESSAGE value="Update scraping logic to handle potential element index issues." />
+    <option name="LAST_COMMIT_MESSAGE" value="Update scraping logic to handle potential element index issues." />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
