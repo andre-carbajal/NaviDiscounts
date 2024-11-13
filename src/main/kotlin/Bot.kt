@@ -24,15 +24,27 @@ class Bot : TelegramLongPollingBot() {
 
             val message = SendMessage()
             message.setChatId(chatId)
-            if (messageText.contains("mifarma.com")) {
-                message.text = scrappingMifarma(messageText)
-            } else if (messageText.contains("inkafarma.pe")) {
-                message.text = scrappingInkaFarma(messageText)
-            } else {
-                message.text = "The URL is not from Mifarma or Inkafarma"
-            }
 
-            execute(message)
+            var command = Commands.fromString(messageText.split(" ")[0])
+            if (command != null) {
+                when (command) {
+                    Commands.START -> {
+                        message.text =
+                            "Welcome to Discounts Bot! Execute the command /request followed by the URL of the product you want to know the offer price"
+                    }
+
+                    Commands.REQUEST -> {
+                        val url = messageText.removePrefix(command.command).trim()
+                        message.text = when {
+                            url.contains("mifarma.com") -> scrappingMifarma(url)
+                            url.contains("inkafarma.pe") -> scrappingInkaFarma(url)
+                            else -> "The URL is not from Mifarma or Inkafarma"
+                        }
+                    }
+                }
+                execute(message)
+                return
+            }
         }
     }
 }

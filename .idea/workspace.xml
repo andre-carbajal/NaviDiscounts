@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="847db1fa-059b-4375-9c7b-90e517119c52" name="Changes" comment="tests removed">
+    <list default="true" id="847db1fa-059b-4375-9c7b-90e517119c52" name="Changes" comment="Scrapping pages from message on the chat">
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/Commands.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/Bot.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/Bot.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/Scrapping.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/Scrapping.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +43,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Kotlin Class" />
+        <option value="Kotlin Enum" />
       </list>
     </option>
   </component>
@@ -146,7 +147,7 @@
       <workItem from="1731510374179" duration="60000" />
       <workItem from="1731510462656" duration="3675000" />
       <workItem from="1731526395976" duration="94000" />
-      <workItem from="1731526516071" duration="3797000" />
+      <workItem from="1731526516071" duration="5571000" />
     </task>
     <task id="LOCAL-00001" summary="jvm version changed to 17">
       <option name="closed" value="true" />
@@ -180,7 +181,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731529555461</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Scrapping pages from message on the chat">
+      <option name="closed" value="true" />
+      <created>1731537512751</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1731537512751</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -191,7 +200,8 @@
     <MESSAGE value="Update scraping logic to handle potential element index issues." />
     <MESSAGE value="scrapping improved" />
     <MESSAGE value="tests removed" />
-    <option name="LAST_COMMIT_MESSAGE" value="tests removed" />
+    <MESSAGE value="Scrapping pages from message on the chat" />
+    <option name="LAST_COMMIT_MESSAGE" value="Scrapping pages from message on the chat" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
