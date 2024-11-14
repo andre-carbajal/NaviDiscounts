@@ -1,5 +1,7 @@
 package net.andrecarbajal.telegramdiscountsbot.bot
 
+import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingInkaFarma
+import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingMifarma
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
