@@ -41,6 +41,10 @@ class Bot : TelegramLongPollingBot() {
                             else -> "The URL is not from Mifarma or Inkafarma"
                         }
                     }
+
+                    else -> {
+                        message.text = "Command not found"
+                    }
                 }
                 execute(message)
                 return
