@@ -57,11 +57,10 @@ class Bot() : TelegramLongPollingBot() {
     }
 
     private fun handleStartCommand(message: SendMessage) {
-        message.text =
-            "Welcome to Discounts Bot! You can use the following commands:\n" +
-                    "/request <url> - Get the discounts from the given URL\n" +
-                    "/add <url> - Add a URL to the list of requests\n" +
-                    "/delete <url> - Delete a URL from the list of requests"
+        val commandsDescription = Commands.entries.joinToString("\n") {
+            if (it.needUrl) "${it.command} <URL> - ${it.description}" else "${it.command} - ${it.description}"
+        }
+        message.text = "Welcome to Discounts Bot! You can use the following commands:\n $commandsDescription"
     }
 
     private fun handleRequestCommand(messageText: String, command: Commands, message: SendMessage) {
