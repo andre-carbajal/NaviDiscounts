@@ -1,4 +1,4 @@
-package net.andrecarbajal
+package net.andrecarbajal.telegramdiscountsbot.bot
 
 enum class Commands(val command: String) {
     START("/start"), REQUEST("/request");

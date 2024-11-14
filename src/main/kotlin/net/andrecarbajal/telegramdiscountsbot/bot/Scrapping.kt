@@ -1,4 +1,4 @@
-package net.andrecarbajal
+package net.andrecarbajal.telegramdiscountsbot.bot
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

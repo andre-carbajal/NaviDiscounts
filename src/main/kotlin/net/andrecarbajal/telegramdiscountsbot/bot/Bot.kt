@@ -1,20 +1,19 @@
-package net.andrecarbajal
+package net.andrecarbajal.telegramdiscountsbot.bot
 
-import io.github.cdimascio.dotenv.Dotenv
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 
 @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 class Bot : TelegramLongPollingBot() {
-    private val dotenv = Dotenv.load()
+    private val token: String = System.getenv("TELEGRAM_BOT_TOKEN")
 
     override fun getBotUsername(): String? {
-        return "DiscountsBot"
+        return "TelegramDiscountsBot"
     }
 
     override fun getBotToken(): String? {
-        return dotenv["TELEGRAM_TOKEN"]
+        return token
     }
 
     override fun onUpdateReceived(update: Update?) {
@@ -25,7 +24,7 @@ class Bot : TelegramLongPollingBot() {
             val message = SendMessage()
             message.setChatId(chatId)
 
-            var command = Commands.fromString(messageText.split(" ")[0])
+            var command = Commands.Companion.fromString(messageText.split(" ")[0])
             if (command != null) {
                 when (command) {
                     Commands.START -> {

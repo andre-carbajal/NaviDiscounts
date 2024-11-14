@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: TelegramDiscountsBot
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discounts
+    username: postgres
+    password: root
