@@ -51,13 +51,17 @@ class Bot() : TelegramLongPollingBot() {
             Commands.START -> handleStartCommand(message)
             Commands.REQUEST -> handleRequestCommand(messageText, command, message)
             Commands.ADD -> handleAddCommand(messageText, command, message)
+            Commands.DELETE -> handleDeleteCommand(messageText, command, message)
         }
         execute(message)
     }
 
     private fun handleStartCommand(message: SendMessage) {
         message.text =
-            "Welcome to Discounts Bot! You can use the following commands:\n" + "/request <url> - Get the discounts from the given URL\n" + "/add <url> - Add a URL to the list of requests"
+            "Welcome to Discounts Bot! You can use the following commands:\n" +
+                    "/request <url> - Get the discounts from the given URL\n" +
+                    "/add <url> - Add a URL to the list of requests\n" +
+                    "/delete <url> - Delete a URL from the list of requests"
     }
 
     private fun handleRequestCommand(messageText: String, command: Commands, message: SendMessage) {
@@ -88,6 +92,21 @@ class Bot() : TelegramLongPollingBot() {
                 message.text = "Request added successfully"
             }
 
+        }
+    }
+
+    private fun handleDeleteCommand(messageText: String, command: Commands, message: SendMessage) {
+        val url = messageText.removePrefix(command.command).trim()
+        if (isNotValidUrl(url)) {
+            message.text = "Invalid URL"
+        } else {
+            val existingRequest = requestRepository.findByChatIdAndUrl(chatId = message.chatId.toLong(), url = url)
+            if (existingRequest != null) {
+                requestRepository.delete(existingRequest)
+                message.text = "Request deleted successfully"
+            } else {
+                message.text = "Request not found"
+            }
         }
     }
 
