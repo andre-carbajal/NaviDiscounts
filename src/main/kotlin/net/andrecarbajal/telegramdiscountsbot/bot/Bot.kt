@@ -57,9 +57,7 @@ class Bot() : TelegramLongPollingBot() {
 
     private fun handleStartCommand(message: SendMessage) {
         message.text =
-            "Welcome to Discounts Bot! You can use the following commands:\n" +
-                    "/request <url> - Get the discounts from the given URL\n" +
-                    "/add <url> - Add a URL to the list of requests"
+            "Welcome to Discounts Bot! You can use the following commands:\n" + "/request <url> - Get the discounts from the given URL\n" + "/add <url> - Add a URL to the list of requests"
     }
 
     private fun handleRequestCommand(messageText: String, command: Commands, message: SendMessage) {
@@ -80,9 +78,16 @@ class Bot() : TelegramLongPollingBot() {
         if (isNotValidUrl(url)) {
             message.text = "Invalid URL"
         } else {
-            val request = Request(chatId = message.chatId.toLong(), url = url)
-            requestRepository.save(request)
-            message.text = "Request added successfully"
+            val existingRequest = requestRepository.findByChatIdAndUrl(chatId = message.chatId.toLong(), url = url)
+            if (existingRequest != null) {
+                message.text = "Request already exists"
+                return
+            } else {
+                val request = Request(chatId = message.chatId.toLong(), url = url)
+                requestRepository.save(request)
+                message.text = "Request added successfully"
+            }
+
         }
     }
 

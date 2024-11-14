@@ -19,4 +19,6 @@ data class Request(
 
 @EnableJpaRepositories
 @Repository
-interface RequestRepository : JpaRepository<Request, Long>
+interface RequestRepository : JpaRepository<Request, Long>{
+    fun findByChatIdAndUrl(chatId: Long, url: String): Request?
+}
