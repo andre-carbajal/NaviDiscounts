@@ -101,9 +101,9 @@ class Bot() : TelegramLongPollingBot() {
 
             val hostParts = host.split(".")
             hostParts.size < 2 || hostParts[0].isEmpty() || hostParts[hostParts.size - 1].isEmpty()
-        } catch (e: MalformedURLException) {
+        } catch (_: MalformedURLException) {
             true
-        } catch (e: URISyntaxException) {
+        } catch (_: URISyntaxException) {
             true
         }
     }
