@@ -13,7 +13,6 @@ import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
 
-
 @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 @Service
 class Bot() : TelegramLongPollingBot() {
@@ -31,54 +30,59 @@ class Bot() : TelegramLongPollingBot() {
     }
 
     override fun onUpdateReceived(update: Update?) {
-        if (update!!.hasMessage() && update.message.hasText()) {
+        if (update?.hasMessage() == true && update.message.hasText()) {
             val messageText = update.message.text
             val chatId = update.message.chatId
 
-            val message = SendMessage()
-            message.setChatId(chatId)
+            val message = SendMessage().apply { setChatId(chatId) }
 
-            var command = Commands.Companion.fromString(messageText.split(" ")[0])
+            val command = Commands.fromString(messageText.split(" ")[0])
             if (command != null) {
-                when (command) {
-                    Commands.START -> {
-                        message.text =
-                            "Welcome to Discounts Bot! Execute the command /request followed by the URL of the product you want to know the offer price"
-                    }
-
-                    Commands.REQUEST -> {
-                        val url = messageText.removePrefix(command.command).trim()
-                        if (isNotValidUrl(url)) {
-                            message.text = "Invalid URL"
-                            execute(message)
-                            return
-                        }
-                        message.text = when {
-                            url.contains("mifarma.com") -> scrappingMifarma(url)
-                            url.contains("inkafarma.pe") -> scrappingInkaFarma(url)
-                            else -> "The URL is not from Mifarma or Inkafarma"
-                        }
-                    }
-
-                    Commands.ADD -> {
-                        val url = messageText.removePrefix(command.command).trim()
-                        if (isNotValidUrl(url)) {
-                            message.text = "Invalid URL"
-                            execute(message)
-                            return
-                        }
-                        var request: Request = Request(chatId = chatId, url = url)
-                        requestRepository.save(request)
-                        message.text = "Request added successfully"
-                    }
-
-                    else -> {
-                        message.text = "Command not found"
-                    }
-                }
+                handleCommand(command, messageText, message)
+            } else {
+                message.text = "Command not found"
                 execute(message)
-                return
             }
+        }
+    }
+
+    private fun handleCommand(command: Commands, messageText: String, message: SendMessage) {
+        when (command) {
+            Commands.START -> handleStartCommand(message)
+            Commands.REQUEST -> handleRequestCommand(messageText, command, message)
+            Commands.ADD -> handleAddCommand(messageText, command, message)
+        }
+        execute(message)
+    }
+
+    private fun handleStartCommand(message: SendMessage) {
+        message.text =
+            "Welcome to Discounts Bot! You can use the following commands:\n" +
+                    "/request <url> - Get the discounts from the given URL\n" +
+                    "/add <url> - Add a URL to the list of requests"
+    }
+
+    private fun handleRequestCommand(messageText: String, command: Commands, message: SendMessage) {
+        val url = messageText.removePrefix(command.command).trim()
+        if (isNotValidUrl(url)) {
+            message.text = "Invalid URL"
+        } else {
+            message.text = when {
+                url.contains("mifarma.com") -> scrappingMifarma(url)
+                url.contains("inkafarma.pe") -> scrappingInkaFarma(url)
+                else -> "The URL is not from Mifarma or Inkafarma"
+            }
+        }
+    }
+
+    private fun handleAddCommand(messageText: String, command: Commands, message: SendMessage) {
+        val url = messageText.removePrefix(command.command).trim()
+        if (isNotValidUrl(url)) {
+            message.text = "Invalid URL"
+        } else {
+            val request = Request(chatId = message.chatId.toLong(), url = url)
+            requestRepository.save(request)
+            message.text = "Request added successfully"
         }
     }
 
@@ -100,7 +104,12 @@ class Bot() : TelegramLongPollingBot() {
             }
 
             val hostParts = host.split(".")
-            hostParts.size < 2 || hostParts[0].isEmpty() || hostParts[hostParts.size - 1].isEmpty()
+            if (hostParts.size < 2 || hostParts[0].isEmpty() || hostParts[hostParts.size - 1].isEmpty()) {
+                url.contains("mifarma.com.pe") || url.contains("inkafarma.pe")
+            } else {
+                false
+            }
+
         } catch (_: MalformedURLException) {
             true
         } catch (_: URISyntaxException) {
