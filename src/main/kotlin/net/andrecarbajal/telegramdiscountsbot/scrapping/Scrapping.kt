@@ -48,19 +48,21 @@ private fun scrapeWebsite(
 }
 
 fun scrappingMifarma(url: String): String {
-    return scrapeWebsite(
+    val result = scrapeWebsite(
         url,
         "h1[class\$='mb-0']",
         "div.col-xs-4.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount",
         "div.col-xs-4.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount"
     )
+    return "Farmacia: Mifarma\n$result"
 }
 
 fun scrappingInkaFarma(url: String): String {
-    return scrapeWebsite(
+    val result = scrapeWebsite(
         url,
         "div[class\$='product-detail-information']",
         "div[class*='col-lg-4']",
         "div.col-xs-5.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount"
     )
+    return "Farmacia: InkaFarma\n$result"
 }
