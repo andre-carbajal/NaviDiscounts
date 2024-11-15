@@ -49,6 +49,7 @@ class Bot @Autowired constructor(private val requestRepository: RequestRepositor
             Commands.REQUEST -> handleRequestCommand(messageText, command, message)
             Commands.ADD -> handleAddCommand(messageText, command, message)
             Commands.DELETE -> handleDeleteCommand(messageText, command, message)
+            Commands.STOP -> handleStopCommand(message)
         }
         execute(message)
     }
@@ -104,6 +105,18 @@ class Bot @Autowired constructor(private val requestRepository: RequestRepositor
                 message.text = "Request not found"
             }
         }
+    }
+
+    //TODO Add confirmation message
+    private fun handleStopCommand(message: SendMessage) {
+        val allRequest: List<Request> = requestRepository.findAllByChatId(message.chatId.toLong())
+        if (allRequest.isEmpty()) {
+            message.text = "You have no any request"
+        }
+        allRequest.forEach {
+            requestRepository.delete(it)
+        }
+        message.text = "All you request were stopped (deleted)"
     }
 
     private fun isNotValidUrl(url: String): Boolean {
