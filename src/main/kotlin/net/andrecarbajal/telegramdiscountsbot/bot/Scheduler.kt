@@ -6,36 +6,36 @@ import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingMifarma
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.time.Duration
-import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
+@Suppress("UNUSED")
 @Component
 class Scheduler @Autowired constructor(private val bot: Bot, private val requestRepository: RequestRepository) {
-
     private val scheduler = Executors.newScheduledThreadPool(1)
-    private var isScheduled = false
 
     init {
         scheduleDailyMessage()
     }
 
     private fun scheduleDailyMessage() {
-        if (isScheduled) return
+        val now = ZonedDateTime.now(ZoneId.of("-05:00"))
+        var nextRun = now.withHour(3).withMinute(0).withSecond(0)
 
-        val now = LocalTime.now()
-        val targetTime = LocalTime.of(19, 15)
-        val initialDelay = if (now.isBefore(targetTime)) {
-            Duration.between(now, targetTime).seconds
-        } else {
-            Duration.between(now, targetTime.plusHours(24)).seconds
-        }
+        if (now > nextRun) nextRun = nextRun.plusDays(1)
 
-        scheduler.scheduleAtFixedRate({
-            sendMessagesToAllUsers()
-        }, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS)
+        val duration = Duration.between(now, nextRun)
+        val initialDelay = duration.toSeconds()
 
-        isScheduled = true
+        scheduler.scheduleAtFixedRate(
+            Runnable {
+                run {
+                    sendMessagesToAllUsers()
+                }
+            }, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS
+        )
     }
 
     private fun sendMessagesToAllUsers() {
@@ -51,5 +51,4 @@ class Scheduler @Autowired constructor(private val bot: Bot, private val request
             bot.sendMessage(chatId, messageText)
         }
     }
-
 }
