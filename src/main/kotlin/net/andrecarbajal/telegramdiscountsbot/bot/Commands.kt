@@ -5,7 +5,8 @@ enum class Commands(val command: String, val description: String, val needUrl: B
     REQUEST("/request", "Get the discounts from the given URL.", true),
     ADD("/add", "Add a URL to the list of requests.", true),
     DELETE("/delete", "Delete a URL from the list of requests.", true),
-    STOP("/stop", "Stop to send information about products('This command will delete all your products that you added.')", false),;
+    STOP("/stop", "Stop receiving product information and delete all added products.", false),
+    LIST("/list", "Get the list of your requests.", false);
 
     companion object {
         fun fromString(command: String): Commands? {

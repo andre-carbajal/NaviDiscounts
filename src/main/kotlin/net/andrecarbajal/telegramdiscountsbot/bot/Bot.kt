@@ -51,6 +51,7 @@ class Bot @Autowired constructor(private val requestRepository: RequestRepositor
             Commands.ADD -> handleAddCommand(messageText, command, message)
             Commands.DELETE -> handleDeleteCommand(messageText, command, message)
             Commands.STOP -> handleStopCommand(message)
+            Commands.LIST -> handleListCommand(message)
         }
         execute(message)
     }
@@ -117,6 +118,16 @@ class Bot @Autowired constructor(private val requestRepository: RequestRepositor
             requestRepository.delete(it)
         }
         message.text = "All you request were stopped (deleted)"
+    }
+
+    private fun handleListCommand(message: SendMessage) {
+        val allRequest: List<Request> = requestRepository.findAllByChatId(message.chatId.toLong())
+        if (allRequest.isEmpty()) {
+            message.text = "You have no requests."
+        } else {
+            message.text = allRequest.mapIndexed { index, request -> "${index + 1}. ${request.url}" }
+                .joinToString(separator = "\n", prefix = "Your request list:\n")
+        }
     }
 
     private fun isNotValidUrl(url: String): Boolean {
