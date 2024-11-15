@@ -1,6 +1,7 @@
 package net.andrecarbajal.telegramdiscountsbot
 
 import net.andrecarbajal.telegramdiscountsbot.bot.Bot
+import net.andrecarbajal.telegramdiscountsbot.bot.Scheduler
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.ApplicationContext
@@ -19,6 +20,8 @@ fun main(args: Array<String>) {
         val bot = context.getBean(Bot::class.java)
         botsApi.registerBot(bot)
         println("Bot is ready!")
+
+        context.getBean(Scheduler::class.java)
     } catch (e: Exception) {
         e.printStackTrace()
     }

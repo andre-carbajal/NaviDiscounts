@@ -15,10 +15,7 @@ import java.net.URISyntaxException
 
 @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 @Service
-class Bot() : TelegramLongPollingBot() {
-    @Autowired
-    lateinit var requestRepository: RequestRepository
-
+class Bot @Autowired constructor(private val requestRepository: RequestRepository) : TelegramLongPollingBot() {
     private val token: String = System.getenv("TELEGRAM_BOT_TOKEN")
 
     override fun getBotUsername(): String? {
@@ -138,5 +135,13 @@ class Bot() : TelegramLongPollingBot() {
         } catch (_: URISyntaxException) {
             true
         }
+    }
+
+    fun sendMessage(chatId: Long, text: String) {
+        val message = SendMessage().apply {
+            setChatId(chatId)
+            setText(text)
+        }
+        execute(message)
     }
 }
