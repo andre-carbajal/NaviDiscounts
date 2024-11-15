@@ -10,7 +10,12 @@ import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
 import java.time.Duration
 
-private fun scrapeWebsite(url: String, cssSelector: String): String {
+private fun scrapeWebsite(
+    url: String,
+    nameCssSelector: String,
+    priceCssSelector: String,
+    offerCssSelector: String
+): String {
     val options = FirefoxOptions()
     // Execute the browser without UI
     options.addArguments("--headless")
@@ -25,17 +30,15 @@ private fun scrapeWebsite(url: String, cssSelector: String): String {
         driver.get(url)
 
         val wait = WebDriverWait(driver, Duration.ofSeconds(30))
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(cssSelector)))
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.product-detail-content")))
 
         val doc: Document = Jsoup.parse(driver.pageSource!!)
 
-        val elementText = doc.select(cssSelector).getOrNull(1)?.text() ?: "There is not an offer"
+        val name = doc.select(nameCssSelector).firstOrNull()?.text() ?: "Name not found"
+        val price = doc.select(priceCssSelector).firstOrNull()?.text() ?: "Price not found"
+        val offer = doc.select(offerCssSelector).getOrNull(1)?.text() ?: "There is not an offer"
 
-        if (elementText == "There is not an offer") {
-            elementText
-        } else {
-            "The price in the offer is: $elementText"
-        }
+        "Product Name: $name\nProduct Price: $price\nOffer: $offer"
     } catch (e: Exception) {
         e.printStackTrace()
         "Error occurred during scraping"
@@ -47,6 +50,8 @@ private fun scrapeWebsite(url: String, cssSelector: String): String {
 fun scrappingMifarma(url: String): String {
     return scrapeWebsite(
         url,
+        "h1[class\$='mb-0']",
+        "div.col-xs-4.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount",
         "div.col-xs-4.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount"
     )
 }
@@ -54,6 +59,8 @@ fun scrappingMifarma(url: String): String {
 fun scrappingInkaFarma(url: String): String {
     return scrapeWebsite(
         url,
+        "div[class\$='product-detail-information']",
+        "div[class*='col-lg-4']",
         "div.col-xs-5.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount"
     )
 }
