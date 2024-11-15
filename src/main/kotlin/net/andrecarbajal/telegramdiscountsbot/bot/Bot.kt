@@ -2,6 +2,7 @@ package net.andrecarbajal.telegramdiscountsbot.bot
 
 import net.andrecarbajal.telegramdiscountsbot.request.Request
 import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
+import net.andrecarbajal.telegramdiscountsbot.scrapping.Websites
 import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingInkaFarma
 import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingMifarma
 import org.springframework.beans.factory.annotation.Autowired
@@ -67,9 +68,9 @@ class Bot @Autowired constructor(private val requestRepository: RequestRepositor
             message.text = "Invalid URL"
         } else {
             message.text = when {
-                url.contains("mifarma.com") -> scrappingMifarma(url)
-                url.contains("inkafarma.pe") -> scrappingInkaFarma(url)
-                else -> "The URL is not from Mifarma or Inkafarma"
+                url.contains(Websites.MIFARMA.url) -> scrappingMifarma(url)
+                url.contains(Websites.INKA_FARMA.url) -> scrappingInkaFarma(url)
+                else -> return
             }
         }
     }
@@ -88,7 +89,6 @@ class Bot @Autowired constructor(private val requestRepository: RequestRepositor
                 requestRepository.save(request)
                 message.text = "Request added successfully"
             }
-
         }
     }
 
@@ -138,9 +138,9 @@ class Bot @Autowired constructor(private val requestRepository: RequestRepositor
 
             val hostParts = host.split(".")
             if (hostParts.size < 2 || hostParts[0].isEmpty() || hostParts[hostParts.size - 1].isEmpty()) {
-                url.contains("mifarma.com.pe") || url.contains("inkafarma.pe")
+                true
             } else {
-                false
+                Websites.entries.none { url.contains(it.url) }
             }
 
         } catch (_: MalformedURLException) {

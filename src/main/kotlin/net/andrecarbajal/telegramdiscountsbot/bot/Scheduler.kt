@@ -1,6 +1,7 @@
 package net.andrecarbajal.telegramdiscountsbot.bot
 
 import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
+import net.andrecarbajal.telegramdiscountsbot.scrapping.Websites
 import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingInkaFarma
 import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingMifarma
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,8 +45,8 @@ class Scheduler @Autowired constructor(private val bot: Bot, private val request
             val url = request.url
             val chatId = request.chatId
             val messageText = when {
-                url.contains("mifarma.com.pe") -> scrappingMifarma(url)
-                url.contains("inkafarma.pe") -> scrappingInkaFarma(url)
+                url.contains(Websites.MIFARMA.url) -> scrappingMifarma(url)
+                url.contains(Websites.INKA_FARMA.url) -> scrappingInkaFarma(url)
                 else -> return@forEach
             }
             bot.sendMessage(chatId, messageText)
