@@ -2,51 +2,38 @@ package net.andrecarbajal.telegramdiscountsbot.bot
 
 import net.andrecarbajal.telegramdiscountsbot.request.Request
 import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
-import net.andrecarbajal.telegramdiscountsbot.scrapping.Websites
-import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingInkaFarma
-import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingMifarma
-import net.andrecarbajal.telegramdiscountsbot.util.isNotValidUrl
+import net.andrecarbajal.telegramdiscountsbot.util.Util
+import org.springframework.core.env.Environment
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import kotlin.collections.forEach
 
-internal fun handleStartCommand(message: SendMessage) {
-    val commandsDescription = Commands.entries.joinToString("\n") {
+internal fun handleStartCommand(message: SendMessage, bot: Bot, environment: Environment) {
+    val isDevelopment = Util.isDevelopment(environment)
+    val commandList = Commands.entries.filter { !it.onDevelopment || isDevelopment }.joinToString("\n") {
         if (it.needUrl) "${it.command} <URL> - ${it.description}" else "${it.command} - ${it.description}"
     }
-    message.text = "Welcome to Discounts Bot! You can use the following commands:\n $commandsDescription"
-}
-
-internal fun handleRequestCommand(messageText: String, command: Commands, message: SendMessage) {
-    val url = messageText.removePrefix(command.command).trim()
-    if (isNotValidUrl(url)) {
-        message.text = "Invalid URL"
-    } else {
-        message.text = when {
-            url.contains(Websites.MIFARMA.url) -> scrappingMifarma(url)
-            url.contains(Websites.INKA_FARMA.url) -> scrappingInkaFarma(url)
-            else -> return
-        }
-    }
+    bot.sendMessage(message.chatId.toLong(), "Available commands:\n$commandList")
 }
 
 internal fun handleAddCommand(
     messageText: String,
     command: Commands,
     message: SendMessage,
-    requestRepository: RequestRepository
+    requestRepository: RequestRepository,
+    bot: Bot
 ) {
     val url = messageText.removePrefix(command.command).trim()
-    if (isNotValidUrl(url)) {
-        message.text = "Invalid URL"
+    if (Util.isNotValidUrl(url)) {
+        bot.sendMessage(message.chatId.toLong(), "Invalid URL")
     } else {
         val existingRequest = requestRepository.findByChatIdAndUrl(chatId = message.chatId.toLong(), url = url)
         if (existingRequest != null) {
-            message.text = "Request already exists"
+            bot.sendMessage(message.chatId.toLong(), "Request already exists")
             return
         } else {
             val request = Request(chatId = message.chatId.toLong(), url = url)
             requestRepository.save(request)
-            message.text = "Request added successfully"
+            bot.sendMessage(message.chatId.toLong(), "Request added successfully")
         }
     }
 }
@@ -55,40 +42,47 @@ internal fun handleDeleteCommand(
     messageText: String,
     command: Commands,
     message: SendMessage,
-    requestRepository: RequestRepository
+    requestRepository: RequestRepository,
+    bot: Bot
 ) {
     val url = messageText.removePrefix(command.command).trim()
-    if (isNotValidUrl(url)) {
-        message.text = "Invalid URL"
+    if (Util.isNotValidUrl(url)) {
+        bot.sendMessage(message.chatId.toLong(), "Invalid URL")
     } else {
         val existingRequest = requestRepository.findByChatIdAndUrl(chatId = message.chatId.toLong(), url = url)
         if (existingRequest != null) {
             requestRepository.delete(existingRequest)
-            message.text = "Request deleted successfully"
+            bot.sendMessage(message.chatId.toLong(), "Request deleted successfully")
         } else {
-            message.text = "Request not found"
+            bot.sendMessage(message.chatId.toLong(), "Request not found")
         }
     }
 }
 
 //TODO Add confirmation message
-internal fun handleStopCommand(message: SendMessage, requestRepository: RequestRepository) {
+internal fun handleStopCommand(message: SendMessage, requestRepository: RequestRepository, bot: Bot) {
     val allRequest: List<Request> = requestRepository.findAllByChatId(message.chatId.toLong())
     if (allRequest.isEmpty()) {
-        message.text = "You have no any request"
+        bot.sendMessage(message.chatId.toLong(), "You have no requests.")
     }
     allRequest.forEach {
         requestRepository.delete(it)
     }
-    message.text = "All you request were stopped (deleted)"
+    bot.sendMessage(message.chatId.toLong(), "All you request were stopped (deleted)")
 }
 
-internal fun handleListCommand(message: SendMessage, requestRepository: RequestRepository) {
+internal fun handleListCommand(message: SendMessage, requestRepository: RequestRepository, bot: Bot) {
     val allRequest: List<Request> = requestRepository.findAllByChatId(message.chatId.toLong())
     if (allRequest.isEmpty()) {
-        message.text = "You have no requests."
+        bot.sendMessage(message.chatId.toLong(), "You have no requests.")
     } else {
-        message.text = allRequest.mapIndexed { index, request -> "${index + 1}. ${request.url}" }
+        var textList = allRequest.mapIndexed { index, request -> "${index + 1}. ${request.url}" }
             .joinToString(separator = "\n", prefix = "Your request list:\n")
+        bot.sendMessage(message.chatId.toLong(), textList)
     }
+}
+
+internal fun handleExeCommand(message: SendMessage, scheduler: Scheduler, bot: Bot) {
+    bot.sendMessage(message.chatId.toLong(), "Scheduled messages sent")
+    scheduler.sendMessagesToAllUsers()
 }

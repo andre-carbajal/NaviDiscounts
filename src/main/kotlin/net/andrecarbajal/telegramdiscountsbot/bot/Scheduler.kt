@@ -5,6 +5,7 @@ import net.andrecarbajal.telegramdiscountsbot.scrapping.Websites
 import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingInkaFarma
 import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingMifarma
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.ZoneId
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeUnit
 
 @Suppress("UNUSED")
 @Component
-class Scheduler @Autowired constructor(private val bot: Bot, private val requestRepository: RequestRepository) {
+class Scheduler @Autowired constructor(@Lazy private var bot: Bot, private val requestRepository: RequestRepository) {
     private val scheduler = Executors.newScheduledThreadPool(1)
 
     init {
@@ -39,7 +40,7 @@ class Scheduler @Autowired constructor(private val bot: Bot, private val request
         )
     }
 
-    private fun sendMessagesToAllUsers() {
+    fun sendMessagesToAllUsers() {
         val requests = requestRepository.findAll()
         requests.forEach { request ->
             val url = request.url
