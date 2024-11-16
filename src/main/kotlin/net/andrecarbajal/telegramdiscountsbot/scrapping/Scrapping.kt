@@ -8,7 +8,11 @@ import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.time.Duration
+
+private val logger: Logger = LoggerFactory.getLogger("Scrapping")
 
 private fun scrapeWebsite(
     url: String,
@@ -40,7 +44,7 @@ private fun scrapeWebsite(
 
         "Product Name: $name\nProduct Price: $price\nOffer: $offer"
     } catch (e: Exception) {
-        e.printStackTrace()
+        logger.error("Error occurred during scraping", e)
         "Error occurred during scraping"
     } finally {
         driver.quit()
