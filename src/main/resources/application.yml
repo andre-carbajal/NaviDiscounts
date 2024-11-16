@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Navi Discount
+    name: Navi Discounts
 
   datasource:
     url: jdbc:postgresql://localhost:5432/discounts
