@@ -8,10 +8,10 @@ import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
 
 @SpringBootApplication
-class TelegramDiscountsBotApplication
+class NaviDiscountsBotApplication
 
 fun main(args: Array<String>) {
-    val context: ApplicationContext = runApplication<TelegramDiscountsBotApplication>(*args)
+    val context: ApplicationContext = runApplication<NaviDiscountsBotApplication>(*args)
 
     val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
 
