@@ -1,6 +1,6 @@
 spring:
   application:
-    name: TelegramDiscountsBot
+    name: Discount Bot
 
   datasource:
     url: jdbc:postgresql://localhost:5432/discounts

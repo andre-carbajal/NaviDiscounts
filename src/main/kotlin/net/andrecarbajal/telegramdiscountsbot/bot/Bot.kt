@@ -19,8 +19,11 @@ import java.net.URISyntaxException
 class Bot @Autowired constructor(private val requestRepository: RequestRepository) : TelegramLongPollingBot() {
     private val token: String = System.getenv("TELEGRAM_BOT_TOKEN")
 
+    @Value("\${spring.application.name}")
+    lateinit var name: String
+
     override fun getBotUsername(): String? {
-        return "TelegramDiscountsBot"
+        return name
     }
 
     override fun getBotToken(): String? {
