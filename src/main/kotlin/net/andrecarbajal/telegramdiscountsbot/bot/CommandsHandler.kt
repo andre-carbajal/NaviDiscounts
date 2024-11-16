@@ -7,7 +7,7 @@ import org.springframework.core.env.Environment
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import kotlin.collections.forEach
 
-internal fun handleStartCommand(message: SendMessage, bot: Bot, environment: Environment) {
+internal fun handleStartCommand(bot: Bot, message: SendMessage, environment: Environment) {
     val isDevelopment = Util.isDevelopment(environment)
     val commandList = Commands.entries.filter { !it.onDevelopment || isDevelopment }.joinToString("\n") {
         if (it.needUrl) "${it.command} <URL> - ${it.description}" else "${it.command} - ${it.description}"
@@ -16,11 +16,11 @@ internal fun handleStartCommand(message: SendMessage, bot: Bot, environment: Env
 }
 
 internal fun handleAddCommand(
+    bot: Bot,
     messageText: String,
     command: Commands,
     message: SendMessage,
-    requestRepository: RequestRepository,
-    bot: Bot
+    requestRepository: RequestRepository
 ) {
     val url = messageText.removePrefix(command.command).trim()
     if (Util.isNotValidUrl(url)) {
@@ -39,11 +39,11 @@ internal fun handleAddCommand(
 }
 
 internal fun handleDeleteCommand(
+    bot: Bot,
     messageText: String,
     command: Commands,
     message: SendMessage,
     requestRepository: RequestRepository,
-    bot: Bot
 ) {
     val url = messageText.removePrefix(command.command).trim()
     if (Util.isNotValidUrl(url)) {
@@ -60,7 +60,7 @@ internal fun handleDeleteCommand(
 }
 
 //TODO Add confirmation message
-internal fun handleStopCommand(message: SendMessage, requestRepository: RequestRepository, bot: Bot) {
+internal fun handleStopCommand(bot: Bot, message: SendMessage, requestRepository: RequestRepository) {
     val allRequest: List<Request> = requestRepository.findAllByChatId(message.chatId.toLong())
     if (allRequest.isEmpty()) {
         bot.sendMessage(message.chatId.toLong(), "You have no requests.")
@@ -71,7 +71,7 @@ internal fun handleStopCommand(message: SendMessage, requestRepository: RequestR
     bot.sendMessage(message.chatId.toLong(), "All you request were stopped (deleted)")
 }
 
-internal fun handleListCommand(message: SendMessage, requestRepository: RequestRepository, bot: Bot) {
+internal fun handleListCommand(bot: Bot, message: SendMessage, requestRepository: RequestRepository) {
     val allRequest: List<Request> = requestRepository.findAllByChatId(message.chatId.toLong())
     if (allRequest.isEmpty()) {
         bot.sendMessage(message.chatId.toLong(), "You have no requests.")
@@ -82,7 +82,7 @@ internal fun handleListCommand(message: SendMessage, requestRepository: RequestR
     }
 }
 
-internal fun handleExeCommand(message: SendMessage, scheduler: Scheduler, bot: Bot) {
+internal fun handleExeCommand(bot: Bot, message: SendMessage, scheduler: Scheduler) {
     bot.sendMessage(message.chatId.toLong(), "Scheduled messages sent")
     scheduler.sendMessagesToAllUsers()
 }

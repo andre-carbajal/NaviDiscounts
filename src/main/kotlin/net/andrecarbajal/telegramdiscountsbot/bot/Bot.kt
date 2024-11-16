@@ -49,13 +49,13 @@ class Bot @Autowired constructor(
 
     private fun handleCommand(command: Commands, messageText: String, message: SendMessage) {
         when (command) {
-            Commands.START -> handleStartCommand(message, this, environment)
-            Commands.ADD -> handleAddCommand(messageText, command, message, requestRepository, this)
-            Commands.DELETE -> handleDeleteCommand(messageText, command, message, requestRepository, this)
-            Commands.STOP -> handleStopCommand(message, requestRepository, this)
-            Commands.LIST -> handleListCommand(message, requestRepository, this)
+            Commands.START -> handleStartCommand(this, message, environment)
+            Commands.ADD -> handleAddCommand(this, messageText, command, message, requestRepository)
+            Commands.DELETE -> handleDeleteCommand(this, messageText, command, message, requestRepository)
+            Commands.STOP -> handleStopCommand(this, message, requestRepository)
+            Commands.LIST -> handleListCommand(this, message, requestRepository)
             Commands.EXE -> if (Util.isDevelopment(environment)) handleExeCommand(
-                message, scheduler, this
+                this, message, scheduler
             ) else sendMessage(message.chatId.toLong(), "Command not found")
         }
     }
