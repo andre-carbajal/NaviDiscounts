@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update
 internal fun handleStartCommand(bot: Bot, message: SendMessage, environment: Environment) {
     val isDevelopment = Util.isDevelopment(environment)
     val commandList = Commands.entries.filter { !it.onDevelopment || isDevelopment }.joinToString("\n") {
-        if (it.needUrl) "${it.command} <URL> - ${it.description}" else "${it.command} - ${it.description}"
+        "${it.command} - ${it.description}"
     }
     bot.sendMessage(message.chatId.toLong(), "Available commands:\n$commandList")
 }
