@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository
 @Entity
 @Table(name = "request")
 data class Request(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
     @JoinColumn(name = "chat_id") val chatId: Long = 0,
     val url: String = " "
 )
