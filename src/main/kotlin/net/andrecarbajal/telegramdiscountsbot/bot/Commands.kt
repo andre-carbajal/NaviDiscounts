@@ -4,8 +4,8 @@ enum class Commands(val command: String, val description: String, val onDevelopm
     START("/start", "Get the list of commands."),
     ADD("/add", "Add a URL to the list of requests."),
     DELETE("/delete", "Delete a URL from the list of requests."),
-    STOP("/stop", "Stop receiving product information and delete all added products."),
     LIST("/list", "Get the list of your requests."),
+    STOP("/stop", "Stop receiving product information and delete all added products."),
     EXE("/exe", "Execute the scheduler. (only in development)", true);
 
     companion object {
