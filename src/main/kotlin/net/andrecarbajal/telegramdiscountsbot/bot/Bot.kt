@@ -1,6 +1,5 @@
 package net.andrecarbajal.telegramdiscountsbot.bot
 
-import net.andrecarbajal.telegramdiscountsbot.request.Request
 import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
 import net.andrecarbajal.telegramdiscountsbot.util.Util
 import org.springframework.beans.factory.annotation.Autowired
@@ -73,100 +72,6 @@ class Bot @Autowired constructor(
             Commands.EXE -> if (Util.isDevelopment(environment)) handleExeCommand(
                 this, message, scheduler
             ) else sendMessage(message.chatId.toLong(), "Command not found")
-        }
-    }
-
-    internal fun handleAddCommand(
-        bot: Bot,
-        update: Update,
-        message: SendMessage,
-        requestRepository: RequestRepository
-    ) {
-        val chatId = message.chatId.toLong()
-        val userState = userStates[chatId]
-
-        if (userState == UserState.AWAITING_URL) {
-            val url = update.message.text
-            if (Util.isNotValidUrl(url)) {
-                bot.sendMessage(chatId, "Invalid URL. Please enter a valid URL.")
-            } else {
-                val existingRequest = requestRepository.findByChatIdAndUrl(chatId = chatId, url = url)
-                if (existingRequest != null) {
-                    bot.sendMessage(chatId, "Request already exists")
-                } else {
-                    val request = Request(chatId = chatId, url = url)
-                    requestRepository.save(request)
-                    bot.sendMessage(chatId, "Request added successfully")
-                }
-                userStates.remove(chatId)
-            }
-        } else {
-            bot.sendMessage(chatId, "Please enter the URL you want to add:")
-            userStates[chatId] = UserState.AWAITING_URL
-        }
-    }
-
-    internal fun handleDeleteCommand(
-        bot: Bot,
-        update: Update,
-        message: SendMessage,
-        requestRepository: RequestRepository
-    ) {
-        val chatId = message.chatId.toLong()
-        val userState = userStates[chatId]
-
-        if (userState == UserState.AWAITING_DELETE_URL) {
-            val url = update.message.text
-            if (Util.isNotValidUrl(url)) {
-                bot.sendMessage(chatId, "Invalid URL. Please enter a valid URL.")
-            } else {
-                val existingRequest = requestRepository.findByChatIdAndUrl(chatId = chatId, url = url)
-                if (existingRequest != null) {
-                    requestRepository.delete(existingRequest)
-                    bot.sendMessage(chatId, "Request deleted successfully")
-                } else {
-                    bot.sendMessage(chatId, "Request not found")
-                }
-                userStates.remove(chatId)
-            }
-        } else {
-            bot.sendMessage(chatId, "Please enter the URL you want to delete:")
-            userStates[chatId] = UserState.AWAITING_DELETE_URL
-        }
-    }
-
-    internal fun handleStopCommand(
-        bot: Bot,
-        update: Update,
-        message: SendMessage,
-        requestRepository: RequestRepository
-    ) {
-        val chatId = message.chatId.toLong()
-        val userState = userStates[chatId]
-
-        if (userState == UserState.AWAITING_STOP_CONFIRMATION) {
-            val confirmation = update.message.text
-            if (confirmation.equals("OK", ignoreCase = true)) {
-                val allRequest: List<Request> = requestRepository.findAllByChatId(chatId)
-                if (allRequest.isEmpty()) {
-                    bot.sendMessage(chatId, "You have no requests.")
-                } else {
-                    allRequest.forEach {
-                        requestRepository.delete(it)
-                    }
-                    bot.sendMessage(chatId, "All your requests were stopped (deleted).")
-                }
-                userStates.remove(chatId)
-            } else {
-                bot.sendMessage(chatId, "Stop command cancelled.")
-                userStates.remove(chatId)
-            }
-        } else {
-            bot.sendMessage(
-                chatId,
-                "Are you sure you want to stop and delete all requests? Please type 'OK' to confirm."
-            )
-            userStates[chatId] = UserState.AWAITING_STOP_CONFIRMATION
         }
     }
 
