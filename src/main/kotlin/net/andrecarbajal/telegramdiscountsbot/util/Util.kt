@@ -44,4 +44,8 @@ object Util {
             true
         }
     }
+
+    fun boldString(text: String): String {
+        return "*$text*"
+    }
 }

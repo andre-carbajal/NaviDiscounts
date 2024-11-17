@@ -79,6 +79,7 @@ class Bot @Autowired constructor(
         val message = SendMessage().apply {
             setChatId(chatId)
             setText(text)
+            enableMarkdown(true)
         }
         execute(message)
     }
