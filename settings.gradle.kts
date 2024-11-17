@@ -1,1 +1,1 @@
-rootProject.name = "TelegramDiscountsBot"
+rootProject.name = "NaviDiscounts"

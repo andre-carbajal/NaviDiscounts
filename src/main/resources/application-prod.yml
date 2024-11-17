@@ -1,9 +1,6 @@
 spring:
   application:
-    name: Navi Discounts
-
-  profiles:
-    active: prod
+    name: Navi Discounts - Prod
 
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Navi Discounts
+    name: Navi Discounts - Dev
 
   profiles:
     active: dev
