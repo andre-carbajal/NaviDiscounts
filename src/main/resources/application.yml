@@ -1,11 +1,33 @@
 spring:
-  application:
-    name: Navi Discounts - Dev
-
   profiles:
     active: dev
 
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  application:
+    name: Navi Discounts - Dev
   datasource:
     url: jdbc:postgresql://localhost:5432/discounts
     username: postgres
     password: root
+  telegram:
+    bot:
+      token: ""
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  application:
+    name: Navi Discounts - Prod
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+  telegram:
+    bot:
+      token: ${TELEGRAM_BOT_TOKEN}

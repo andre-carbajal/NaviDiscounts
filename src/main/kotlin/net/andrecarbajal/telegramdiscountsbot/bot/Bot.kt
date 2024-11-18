@@ -17,7 +17,13 @@ class Bot @Autowired constructor(
     private val requestRepository: RequestRepository,
     private val scheduler: Scheduler
 ) : TelegramLongPollingBot() {
-    private val token: String = System.getenv("TELEGRAM_BOT_TOKEN")
+
+    @Value("\${spring.telegram.bot.token}")
+    private lateinit var token: String
+
+    private fun getToken(): String {
+        return if (token.isEmpty()) System.getenv("TELEGRAM_BOT_TOKEN") else token
+    }
 
     @Value("\${spring.application.name}")
     private lateinit var name: String
@@ -27,7 +33,7 @@ class Bot @Autowired constructor(
     }
 
     override fun getBotToken(): String? {
-        return token
+        return getToken()
     }
 
     val userStates = mutableMapOf<Long, UserState>()
