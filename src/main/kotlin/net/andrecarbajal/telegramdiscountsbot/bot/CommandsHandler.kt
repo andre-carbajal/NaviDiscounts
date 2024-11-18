@@ -71,24 +71,28 @@ internal fun handleDeleteCommand(
     val chatId = message.chatId.toLong()
     val userState = bot.userStates[chatId]
 
-    if (userState == Bot.UserState.AWAITING_DELETE_URL) {
-        val url = update.message.text
-        if (Util.isNotValidUrl(url)) {
-            bot.sendMessage(chatId, "\uD83D\uDEAB Invalid URL. Please execute the command again and enter a valid URL.")
-            bot.userStates.remove(chatId)
+    if (userState == Bot.UserState.AWAITING_DELETE_INDEX) {
+        val index = update.message.text.toIntOrNull()
+        val allRequest: List<Request> = requestRepository.findAllByChatId(chatId)
+        if (index == null || index !in 1..allRequest.size) {
+            bot.sendMessage(chatId, "\uD83D\uDEAB Invalid index. Please execute the command again and enter a valid index.")
         } else {
-            val existingRequest = requestRepository.findByChatIdAndUrl(chatId = chatId, url = url)
-            if (existingRequest != null) {
-                requestRepository.delete(existingRequest)
-                bot.sendMessage(chatId, "\u26A0 Request deleted successfully")
-            } else {
-                bot.sendMessage(chatId, "\u26A0 Request not found")
-            }
-            bot.userStates.remove(chatId)
+            val request = allRequest[index - 1]
+            requestRepository.delete(request)
+            bot.sendMessage(chatId, "\u26A0 Request deleted successfully")
         }
+        bot.userStates.remove(chatId)
     } else {
-        bot.sendMessage(chatId, "\uD83D\uDC47 Please enter the URL you want to delete:")
-        bot.userStates[chatId] = Bot.UserState.AWAITING_DELETE_URL
+        val allRequest: List<Request> = requestRepository.findAllByChatId(chatId)
+        if (allRequest.isEmpty()) {
+            bot.sendMessage(chatId, "\u26A0 You have no requests.")
+        } else {
+            val textList = allRequest.mapIndexed { index, request -> "${index + 1}. ${request.url}" }
+                .joinToString(separator = "\n", prefix = "${Util.boldString("\uD83D\uDCDC Your request list:")}\n")
+            bot.sendMessage(chatId, textList)
+            bot.sendMessage(chatId, "\uD83D\uDC47 Please enter the number of the request you want to delete:")
+            bot.userStates[chatId] = Bot.UserState.AWAITING_DELETE_INDEX
+        }
     }
 }
 

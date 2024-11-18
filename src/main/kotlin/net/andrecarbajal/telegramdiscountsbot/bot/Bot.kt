@@ -40,7 +40,7 @@ class Bot @Autowired constructor(
 
     enum class UserState {
         AWAITING_URL,
-        AWAITING_DELETE_URL,
+        AWAITING_DELETE_INDEX,
         AWAITING_STOP_CONFIRMATION,
         NONE
     }
@@ -56,7 +56,7 @@ class Bot @Autowired constructor(
 
             when (userState) {
                 UserState.AWAITING_URL -> handleAddCommand(this, update, message, requestRepository)
-                UserState.AWAITING_DELETE_URL -> handleDeleteCommand(this, update, message, requestRepository)
+                UserState.AWAITING_DELETE_INDEX -> handleDeleteCommand(this, update, message, requestRepository)
                 UserState.AWAITING_STOP_CONFIRMATION -> handleStopCommand(this, update, message, requestRepository)
                 else -> {
                     val command = Commands.fromString(messageText)
