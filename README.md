@@ -47,3 +47,7 @@ NaviDiscounts is a telegram bot that helps you find discounts on your favorite p
 
 If you want to contribute to the project, you can create a pull request with the changes you want to make. If you have
 any questions or issue, you can create an [issue](https://github.com/andre-carbajal/NaviDiscounts/issues).
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
