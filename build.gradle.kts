@@ -58,3 +58,10 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+tasks.register("printEnv") {
+    doLast {
+        val envFile = File(System.getenv("GITHUB_ENV"))
+        envFile.appendText("VERSION=$version")
+    }
+}
