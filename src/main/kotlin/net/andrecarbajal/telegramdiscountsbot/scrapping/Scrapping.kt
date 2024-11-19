@@ -19,21 +19,24 @@ private fun scrapeWebsite(
     nameCssSelector: String,
     priceCssSelector: String,
     offerCssSelector: String
-): String {
+): Any? {
     val options = FirefoxOptions()
     // Execute the browser without UI
     options.addArguments("--headless")
     // Execute the browser without security
     options.addArguments("--no-sandbox")
-    // Execute the browser without shared memory
-    options.addArguments("--disable-dev-shm-usage")
 
-    val driver: WebDriver = FirefoxDriver(options)
+    val driver: WebDriver = try {
+        FirefoxDriver(options)
+    } catch (e: Exception) {
+        logger.error("Error occurred while creating FirefoxDriver", e)
+        return null
+    }
 
     return try {
         driver.get(url)
 
-        val wait = WebDriverWait(driver, Duration.ofSeconds(30))
+        val wait = WebDriverWait(driver, Duration.ofMinutes(5))
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.product-detail-content")))
 
         val doc: Document = Jsoup.parse(driver.pageSource!!)
@@ -45,7 +48,7 @@ private fun scrapeWebsite(
         "Product Name: $name\nProduct Price: $price\nOffer: $offer"
     } catch (e: Exception) {
         logger.error("Error occurred during scraping", e)
-        "Error occurred during scraping"
+        return null
     } finally {
         driver.quit()
     }
