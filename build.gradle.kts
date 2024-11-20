@@ -59,6 +59,10 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks.getByName<Jar>("jar") {
+    enabled = false
+}
+
 tasks.register("printEnv") {
     doLast {
         val envFile = File(System.getenv("GITHUB_ENV"))
