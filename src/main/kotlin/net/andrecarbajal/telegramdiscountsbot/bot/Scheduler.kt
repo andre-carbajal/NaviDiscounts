@@ -36,7 +36,7 @@ class Scheduler @Autowired constructor(
         val now = ZonedDateTime.now(ZoneId.of(schedulerConfiguration.timeZone))
 
         val (hour, minute) = parseTime(schedulerConfiguration.executionTime)
-        var nextRun = now.withHour(hour).withMinute(minute)
+        var nextRun = now.withHour(hour).withMinute(minute).withSecond(0)
 
         if (now > nextRun) nextRun = nextRun.plusDays(1)
 
