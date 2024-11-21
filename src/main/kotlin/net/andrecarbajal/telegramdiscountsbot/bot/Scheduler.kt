@@ -5,6 +5,7 @@ import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
 import net.andrecarbajal.telegramdiscountsbot.scrapping.Websites
 import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingInkaFarma
 import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingMifarma
+import net.andrecarbajal.telegramdiscountsbot.util.Util
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,7 +49,7 @@ class Scheduler @Autowired constructor(
         scheduler.scheduleAtFixedRate(
             Runnable {
                 run {
-                    logger.info("The send messages to all users task is running")
+                    logger.info("Send messages to all users task is running")
                     sendMessagesToAllUsers()
                 }
             }, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS
@@ -60,13 +61,15 @@ class Scheduler @Autowired constructor(
         requests.forEach { request ->
             val url = request.url
             val chatId = request.chatId
-            val messageText = when {
+            val data = when {
                 url.contains(Websites.MIFARMA.url) -> scrappingMifarma(url)
                 url.contains(Websites.INKA_FARMA.url) -> scrappingInkaFarma(url)
                 else -> null
             }
-            if (messageText != null) {
-                bot.sendMessage(chatId, messageText)
+            if (data != null) {
+                if (data[3] != null) {
+                    bot.sendMessage(chatId, parseMessageText(data))
+                }
             } else {
                 logger.warn("Scraping result is null")
             }
@@ -78,5 +81,19 @@ class Scheduler @Autowired constructor(
         val hour = parts[0].toInt()
         val minute = parts[1].toInt()
         return Pair(hour, minute)
+    }
+
+    private fun parseMessageText(data: List<String?>): String {
+        val pharmacy = data[0]
+        val name = data[1]
+        val price = data[2]
+        val offer = data[3]
+
+        return """
+            |Pharmacy: $pharmacy
+            |Product Name: $name
+            |Price: $price
+            |${Util.boldString("Offer: $offer")}
+        """.trimMargin()
     }
 }

@@ -19,7 +19,7 @@ private fun scrapeWebsite(
     nameCssSelector: String,
     priceCssSelector: String,
     offerCssSelector: String
-): Any? {
+): Triple<String, String, String?>? {
     val options = FirefoxOptions()
     // Execute the browser without UI
     options.addArguments("--headless")
@@ -35,41 +35,39 @@ private fun scrapeWebsite(
 
     return try {
         driver.get(url)
-
-        val wait = WebDriverWait(driver, Duration.ofMinutes(5))
+        val wait = WebDriverWait(driver, Duration.ofMinutes(10))
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.product-detail-content")))
 
         val doc: Document = Jsoup.parse(driver.pageSource!!)
-
         val name = doc.select(nameCssSelector).firstOrNull()?.text() ?: "Name not found"
         val price = doc.select(priceCssSelector).firstOrNull()?.text() ?: "Price not found"
-        val offer = doc.select(offerCssSelector).getOrNull(1)?.text() ?: "There is not an offer"
+        val offer = doc.select(offerCssSelector).getOrNull(1)?.text()
 
-        "Product Name: $name\nProduct Price: $price\nOffer: $offer"
+        Triple(name, price, offer)
     } catch (e: Exception) {
         logger.error("Error occurred during scraping", e)
-        return null
+        null
     } finally {
         driver.quit()
     }
 }
 
-fun scrappingMifarma(url: String): String {
+fun scrappingMifarma(url: String): List<String?>? {
     val result = scrapeWebsite(
         url,
         "h1[class\$='mb-0']",
         "div.col-xs-4.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount",
         "div.col-xs-4.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount"
-    )
-    return "Farmacia: Mifarma\n$result"
+    ) ?: return null
+    return listOf("MiFarma", result.first, result.second, result.third)
 }
 
-fun scrappingInkaFarma(url: String): String {
+fun scrappingInkaFarma(url: String): List<String?>? {
     val result = scrapeWebsite(
         url,
         "div[class\$='product-detail-information']",
         "div[class*='col-lg-4']",
         "div.col-xs-5.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount"
-    )
-    return "Farmacia: InkaFarma\n$result"
+    ) ?: return null
+    return listOf("InkaFarma", result.first, result.second, result.third)
 }

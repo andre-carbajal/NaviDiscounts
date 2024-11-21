@@ -1,7 +1,6 @@
 # Release Notes
 
-- Adding more environment variable with default values
-  - TELEGRAM_BOT_TOKEN: ""
-  - ENABLED_EXE_COMMAND: false
-  - TIME_ZONE: UTC
-  - EXECUTION_TIME: 00:00
+- Update `Scheduler` class to send messages based on scraping results.
+- Add `parseMessageText` function to format scraping results.
+- Update `scrapeWebsite` function to return a `Triple` instead of `Any?`.
+- Update `scrappingMifarma` and `scrappingInkaFarma` functions to return a `List` instead of `String`.

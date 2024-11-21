@@ -30,10 +30,7 @@ class Bot @Autowired constructor(
     val userStates = mutableMapOf<Long, UserState>()
 
     enum class UserState {
-        AWAITING_URL,
-        AWAITING_DELETE_INDEX,
-        AWAITING_STOP_CONFIRMATION,
-        NONE
+        AWAITING_URL, AWAITING_DELETE_INDEX, AWAITING_STOP_CONFIRMATION, NONE
     }
 
     override fun onUpdateReceived(update: Update?) {
@@ -68,7 +65,7 @@ class Bot @Autowired constructor(
             Commands.LIST -> handleListCommand(this, message, requestRepository)
             Commands.EXE -> if (schedulerConfiguration.enabledExeCommand) handleExeCommand(
                 this, message, scheduler
-            ) else sendMessage(message.chatId.toLong(), "Command not found")
+            )
         }
     }
 
