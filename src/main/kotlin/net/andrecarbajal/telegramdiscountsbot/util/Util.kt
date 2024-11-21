@@ -1,19 +1,11 @@
 package net.andrecarbajal.telegramdiscountsbot.util
 
 import net.andrecarbajal.telegramdiscountsbot.scrapping.Websites
-import org.springframework.core.env.Environment
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
-import kotlin.collections.contains
-import kotlin.text.isEmpty
-import kotlin.text.split
 
 object Util {
-    fun isDevelopment(environment: Environment): Boolean {
-        return environment.activeProfiles.contains("dev")
-    }
-
     fun isNotValidUrl(url: String): Boolean {
         val urlRegex = "^(https?|ftp)://([a-zA-Z0-9.-]+)(:[0-9]+)?(/.*)?$"
         val urlPattern = Regex(urlRegex)

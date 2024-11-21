@@ -10,12 +10,15 @@ spring:
   application:
     name: Navi Discounts - Dev
   datasource:
-    url: jdbc:postgresql://localhost:5432/discounts
-    username: postgres
-    password: root
-  telegram:
-    bot:
-      token: ""
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:discounts}
+    username: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD:root}
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN:}
+    scheduler:
+      enabledExeCommand: ${ENABLED_EXE_COMMAND:true}
+      timeZone: ${TIME_ZONE:UTC}
+      executionTime: ${EXECUTION_TIME:00:00}
 
 ---
 spring:
@@ -28,6 +31,9 @@ spring:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
-  telegram:
-    bot:
-      token: ${TELEGRAM_BOT_TOKEN}
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN}
+    scheduler:
+      enabledExeCommand: ${ENABLED_EXE_COMMAND:false}
+      timeZone: ${TIME_ZONE:UTC}
+      executionTime: ${EXECUTION_TIME:00:00}

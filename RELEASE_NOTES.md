@@ -1,6 +1,7 @@
 # Release Notes
 
-- Logs are now stored in the `logs` directory
-- Logger added to Scheduler
-- Logger and error handling added to Scrapping 
-- Dockerfile added
+- Adding more environment variable with default values
+  - TELEGRAM_BOT_TOKEN: ""
+  - ENABLED_EXE_COMMAND: false
+  - TIME_ZONE: UTC
+  - EXECUTION_TIME: 00:00

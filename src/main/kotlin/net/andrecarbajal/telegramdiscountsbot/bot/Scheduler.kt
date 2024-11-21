@@ -1,5 +1,6 @@
 package net.andrecarbajal.telegramdiscountsbot.bot
 
+import net.andrecarbajal.telegramdiscountsbot.SchedulerConfiguration
 import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
 import net.andrecarbajal.telegramdiscountsbot.scrapping.Websites
 import net.andrecarbajal.telegramdiscountsbot.scrapping.scrappingInkaFarma
@@ -18,7 +19,11 @@ import java.util.concurrent.TimeUnit
 
 @Suppress("UNUSED")
 @Component
-class Scheduler @Autowired constructor(@Lazy private var bot: Bot, private val requestRepository: RequestRepository) {
+class Scheduler @Autowired constructor(
+    @Lazy private var bot: Bot,
+    private val schedulerConfiguration: SchedulerConfiguration,
+    private val requestRepository: RequestRepository
+) {
     private val logger: Logger = LoggerFactory.getLogger(Scheduler::class.java)
     private val scheduler = Executors.newScheduledThreadPool(1)
 
@@ -27,8 +32,10 @@ class Scheduler @Autowired constructor(@Lazy private var bot: Bot, private val r
     }
 
     private fun scheduleDailyMessage() {
-        val now = ZonedDateTime.now(ZoneId.of("-05:00"))
-        var nextRun = now.withHour(3).withMinute(0)
+        val now = ZonedDateTime.now(ZoneId.of(schedulerConfiguration.timeZone))
+
+        val (hour, minute) = parseTime(schedulerConfiguration.executionTime)
+        var nextRun = now.withHour(hour).withMinute(minute)
 
         if (now > nextRun) nextRun = nextRun.plusDays(1)
 
@@ -64,5 +71,12 @@ class Scheduler @Autowired constructor(@Lazy private var bot: Bot, private val r
                 logger.warn("Scraping result is null")
             }
         }
+    }
+
+    private fun parseTime(time: String): Pair<Int, Int> {
+        val parts = time.split(":")
+        val hour = parts[0].toInt()
+        val minute = parts[1].toInt()
+        return Pair(hour, minute)
     }
 }

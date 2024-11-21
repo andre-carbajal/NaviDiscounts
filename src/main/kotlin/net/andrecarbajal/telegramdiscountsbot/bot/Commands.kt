@@ -6,7 +6,7 @@ enum class Commands(val command: String, val description: String, val onDevelopm
     DELETE("/delete", "Delete a URL from the list of requests."),
     LIST("/list", "Get the list of your requests."),
     STOP("/stop", "Stop receiving product information and delete all added products."),
-    EXE("/exe", "Execute the scheduler. (only in development)", true);
+    EXE("/exe", "Execute the scheduler.", true);
 
     companion object {
         fun fromString(command: String): Commands? {

@@ -1,10 +1,10 @@
 package net.andrecarbajal.telegramdiscountsbot.bot
 
+import net.andrecarbajal.telegramdiscountsbot.ApplicationConfiguration
+import net.andrecarbajal.telegramdiscountsbot.SchedulerConfiguration
+import net.andrecarbajal.telegramdiscountsbot.TelegramBotConfiguration
 import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
-import net.andrecarbajal.telegramdiscountsbot.util.Util
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
@@ -13,27 +13,18 @@ import org.telegram.telegrambots.meta.api.objects.Update
 @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 @Service
 class Bot @Autowired constructor(
-    private val environment: Environment,
     private val requestRepository: RequestRepository,
-    private val scheduler: Scheduler
+    private val scheduler: Scheduler,
+    private val applicationConfiguration: ApplicationConfiguration,
+    private val telegramBotConfiguration: TelegramBotConfiguration,
+    private val schedulerConfiguration: SchedulerConfiguration
 ) : TelegramLongPollingBot() {
-
-    @Value("\${spring.telegram.bot.token}")
-    private lateinit var token: String
-
-    private fun getToken(): String {
-        return if (token.isEmpty()) System.getenv("TELEGRAM_BOT_TOKEN") else token
-    }
-
-    @Value("\${spring.application.name}")
-    private lateinit var name: String
-
     override fun getBotUsername(): String? {
-        return name
+        return applicationConfiguration.name
     }
 
     override fun getBotToken(): String? {
-        return getToken()
+        return telegramBotConfiguration.token
     }
 
     val userStates = mutableMapOf<Long, UserState>()
@@ -70,12 +61,12 @@ class Bot @Autowired constructor(
 
     private fun handleCommand(update: Update, command: Commands, message: SendMessage) {
         when (command) {
-            Commands.START -> handleStartCommand(this, message, environment)
+            Commands.START -> handleStartCommand(this, message, schedulerConfiguration)
             Commands.ADD -> handleAddCommand(this, update, message, requestRepository)
             Commands.DELETE -> handleDeleteCommand(this, update, message, requestRepository)
             Commands.STOP -> handleStopCommand(this, update, message, requestRepository)
             Commands.LIST -> handleListCommand(this, message, requestRepository)
-            Commands.EXE -> if (Util.isDevelopment(environment)) handleExeCommand(
+            Commands.EXE -> if (schedulerConfiguration.enabledExeCommand) handleExeCommand(
                 this, message, scheduler
             ) else sendMessage(message.chatId.toLong(), "Command not found")
         }

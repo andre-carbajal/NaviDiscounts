@@ -1,15 +1,15 @@
 package net.andrecarbajal.telegramdiscountsbot.bot
 
+import net.andrecarbajal.telegramdiscountsbot.SchedulerConfiguration
 import net.andrecarbajal.telegramdiscountsbot.request.Request
 import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
 import net.andrecarbajal.telegramdiscountsbot.util.Util
-import org.springframework.core.env.Environment
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 
-internal fun handleStartCommand(bot: Bot, message: SendMessage, environment: Environment) {
-    val isDevelopment = Util.isDevelopment(environment)
-    val commandList = Commands.entries.filter { !it.onDevelopment || isDevelopment }.joinToString("\n") {
+internal fun handleStartCommand(bot: Bot, message: SendMessage, schedulerConfiguration: SchedulerConfiguration) {
+    val enableExeCommand = schedulerConfiguration.enabledExeCommand
+    val commandList = Commands.entries.filter { !it.onDevelopment || enableExeCommand }.joinToString("\n") {
         "${it.command} - ${it.description}"
     }
     bot.sendMessage(message.chatId.toLong(), "${Util.boldString("Available commands:")}\n$commandList")
@@ -75,7 +75,10 @@ internal fun handleDeleteCommand(
         val index = update.message.text.toIntOrNull()
         val allRequest: List<Request> = requestRepository.findAllByChatId(chatId)
         if (index == null || index !in 1..allRequest.size) {
-            bot.sendMessage(chatId, "\uD83D\uDEAB Invalid index. Please execute the command again and enter a valid index.")
+            bot.sendMessage(
+                chatId,
+                "\uD83D\uDEAB Invalid index. Please execute the command again and enter a valid index."
+            )
         } else {
             val request = allRequest[index - 1]
             requestRepository.delete(request)

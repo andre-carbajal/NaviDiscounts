@@ -4,12 +4,18 @@ import net.andrecarbajal.telegramdiscountsbot.bot.Bot
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.ApplicationContext
 import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
 
 @SpringBootApplication
+@EnableConfigurationProperties(
+    ApplicationConfiguration::class,
+    TelegramBotConfiguration::class,
+    SchedulerConfiguration::class
+)
 class NaviDiscountsBotApplication
 
 fun main(args: Array<String>) {
