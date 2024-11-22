@@ -28,19 +28,20 @@ class Scheduler @Autowired constructor(
     private val logger: Logger = LoggerFactory.getLogger(Scheduler::class.java)
     private val scheduler = Executors.newScheduledThreadPool(1)
 
+    private val dataTimePattern = "yyyy-MM-dd HH:mm:ss z"
+
     init {
         scheduleDailyMessage()
     }
 
     private fun scheduleDailyMessage() {
         val now = ZonedDateTime.now(ZoneId.of(schedulerConfiguration.timeZone))
-
         val (hour, minute) = parseTime(schedulerConfiguration.executionTime)
         var nextRun = now.withHour(hour).withMinute(minute).withSecond(0)
 
         if (now > nextRun) nextRun = nextRun.plusDays(1)
 
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z")
+        val formatter = DateTimeFormatter.ofPattern(dataTimePattern)
         logger.info("Scheduler will run at: ${nextRun.format(formatter)}")
 
         val duration = Duration.between(now, nextRun)
@@ -49,8 +50,12 @@ class Scheduler @Autowired constructor(
         scheduler.scheduleAtFixedRate(
             Runnable {
                 run {
-                    logger.info("Send messages to all users task is running")
-                    sendMessagesToAllUsers()
+                    try {
+                        logger.info("Send messages to all users task is running")
+                        sendMessagesToAllUsers()
+                    } catch (e: Exception) {
+                        logger.error("Error occurred while sending messages", e)
+                    }
                 }
             }, initialDelay, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS
         )
@@ -68,7 +73,11 @@ class Scheduler @Autowired constructor(
             }
             if (data != null) {
                 if (data[3] != null) {
-                    bot.sendMessage(chatId, parseMessageText(data))
+                    if (data[4] != null) {
+                        bot.sendPhotoMessage(chatId, parseMessageText(data, url), data[4]!!)
+                    } else {
+                        bot.sendMessage(chatId, parseMessageText(data, url))
+                    }
                 }
             } else {
                 logger.warn("Scraping result is null")
@@ -83,7 +92,7 @@ class Scheduler @Autowired constructor(
         return Pair(hour, minute)
     }
 
-    private fun parseMessageText(data: List<String?>): String {
+    private fun parseMessageText(data: List<String?>, url: String): String {
         val pharmacy = data[0]
         val name = data[1]
         val price = data[2]
@@ -94,6 +103,7 @@ class Scheduler @Autowired constructor(
             |Product Name: $name
             |Price: $price
             |${Util.boldString("Offer: $offer")}
+            |URL: $url
         """.trimMargin()
     }
 }

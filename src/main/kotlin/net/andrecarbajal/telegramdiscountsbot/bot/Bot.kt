@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto
+import org.telegram.telegrambots.meta.api.objects.InputFile
 import org.telegram.telegrambots.meta.api.objects.Update
 
 @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
@@ -76,5 +78,16 @@ class Bot @Autowired constructor(
             enableMarkdown(true)
         }
         execute(message)
+    }
+
+    fun sendPhotoMessage(chatId: Long, caption: String, photo_url: String) {
+        val inputFile = InputFile(photo_url)
+        val sendPhoto = SendPhoto().apply {
+            setChatId(chatId)
+            setPhoto(inputFile)
+            setCaption(caption)
+            parseMode = "Markdown"
+        }
+        execute(sendPhoto)
     }
 }
