@@ -13,6 +13,10 @@ internal fun handleStartCommand(bot: Bot, message: SendMessage, schedulerConfigu
         "${it.command} - ${it.description}"
     }
     bot.sendMessage(message.chatId.toLong(), "${Util.boldString("Available commands:")}\n$commandList")
+    bot.sendMessage(
+        message.chatId.toLong(),
+        "The bot will notify you at ${Util.boldString(schedulerConfiguration.executionTime)} (${schedulerConfiguration.timeZone})"
+    )
 }
 
 internal fun handleListCommand(bot: Bot, message: SendMessage, requestRepository: RequestRepository) {
@@ -32,10 +36,7 @@ internal fun handleExeCommand(bot: Bot, message: SendMessage, scheduler: Schedul
 }
 
 internal fun handleAddCommand(
-    bot: Bot,
-    update: Update,
-    message: SendMessage,
-    requestRepository: RequestRepository
+    bot: Bot, update: Update, message: SendMessage, requestRepository: RequestRepository
 ) {
     val chatId = message.chatId.toLong()
     val userState = bot.userStates[chatId]
@@ -63,10 +64,7 @@ internal fun handleAddCommand(
 }
 
 internal fun handleDeleteCommand(
-    bot: Bot,
-    update: Update,
-    message: SendMessage,
-    requestRepository: RequestRepository
+    bot: Bot, update: Update, message: SendMessage, requestRepository: RequestRepository
 ) {
     val chatId = message.chatId.toLong()
     val userState = bot.userStates[chatId]
@@ -76,8 +74,7 @@ internal fun handleDeleteCommand(
         val allRequest: List<Request> = requestRepository.findAllByChatId(chatId)
         if (index == null || index !in 1..allRequest.size) {
             bot.sendMessage(
-                chatId,
-                "\uD83D\uDEAB Invalid index. Please execute the command again and enter a valid index."
+                chatId, "\uD83D\uDEAB Invalid index. Please execute the command again and enter a valid index."
             )
         } else {
             val request = allRequest[index - 1]
@@ -100,10 +97,7 @@ internal fun handleDeleteCommand(
 }
 
 internal fun handleStopCommand(
-    bot: Bot,
-    update: Update,
-    message: SendMessage,
-    requestRepository: RequestRepository
+    bot: Bot, update: Update, message: SendMessage, requestRepository: RequestRepository
 ) {
     val chatId = message.chatId.toLong()
     val userState = bot.userStates[chatId]
