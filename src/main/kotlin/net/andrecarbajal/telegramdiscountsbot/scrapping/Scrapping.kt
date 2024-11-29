@@ -15,12 +15,8 @@ import java.time.Duration
 private val logger: Logger = LoggerFactory.getLogger("Scrapping")
 
 private fun scrapeWebsite(
-    url: String,
-    nameCssSelector: String,
-    priceCssSelector: String,
-    offerCssSelector: String
+    url: String, nameCssSelector: String, priceCssSelector: String, offerCssSelector: String
 ): List<String?>? {
-    val waitCssSelector = "div.product-detail-content"
     val imageCssSelector = "img.ngxImageZoomThumbnail"
 
     val options = FirefoxOptions()
@@ -36,14 +32,15 @@ private fun scrapeWebsite(
 
     return try {
         driver.get(url)
-        val wait = WebDriverWait(driver, Duration.ofMinutes(5))
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(waitCssSelector)))
+
+        val waitForImage = WebDriverWait(driver, Duration.ofMinutes(5))
+        waitForImage.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(imageCssSelector)))
 
         val doc: Document = Jsoup.parse(driver.pageSource!!)
         val name = doc.select(nameCssSelector).firstOrNull()?.text() ?: "Name not found"
         val price = doc.select(priceCssSelector).firstOrNull()?.text() ?: "Price not found"
         val offer = doc.select(offerCssSelector).getOrNull(1)?.text()
-        var img = doc.select(imageCssSelector).firstOrNull()?.attr("src")
+        val img = doc.select(imageCssSelector).firstOrNull()?.attr("src")
 
         listOf(name, price, offer, img)
     } catch (e: Exception) {
@@ -61,7 +58,7 @@ fun scrappingMifarma(url: String): List<String?>? {
         "div.col-xs-4.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount",
         "div.col-xs-4.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount"
     ) ?: return null
-    return listOf("MiFarma", result[0], result[1], result[2], result[3])
+    return listOf("Mifarma", result[0], result[1], result[2], result[3])
 }
 
 fun scrappingInkaFarma(url: String): List<String?>? {
@@ -71,5 +68,5 @@ fun scrappingInkaFarma(url: String): List<String?>? {
         "div[class*='col-lg-4']",
         "div.col-xs-5.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount"
     ) ?: return null
-    return listOf("InkaFarma", result[0], result[1], result[2], result[3])
+    return listOf("Inkafarma", result[0], result[1], result[2], result[3])
 }

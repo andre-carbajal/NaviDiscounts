@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "net.andrecarbajal"
-version = "1.5"
+version = "1.5.1"
 
 java {
     toolchain {
@@ -39,8 +39,8 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:2.3.1")
 
     implementation("org.telegram:telegrambots:6.9.7.1")
-    implementation("org.seleniumhq.selenium:selenium-java:4.26.0")
-    implementation("org.jsoup:jsoup:1.18.1")
+    implementation("org.seleniumhq.selenium:selenium-java:4.27.0")
+    implementation("org.jsoup:jsoup:1.18.2")
 }
 
 kotlin {

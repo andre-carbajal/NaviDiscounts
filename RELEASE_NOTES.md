@@ -1,3 +1,4 @@
 # Release Notes
 
-- Notification time is now displayed at the /start command
+- Some dependency updates
+- Wait until changed to imageCssSelector
