@@ -32,7 +32,7 @@ class Bot @Autowired constructor(
     val userStates = mutableMapOf<Long, UserState>()
 
     enum class UserState {
-        AWAITING_URL, AWAITING_DELETE_INDEX, AWAITING_STOP_CONFIRMATION, NONE
+        AWAITING_URL, AWAITING_DELETE_INDEX, AWAITING_STOP_CONFIRMATION, AWAITING_POSTPONE_TIME, NONE
     }
 
     override fun onUpdateReceived(update: Update?) {
@@ -48,6 +48,7 @@ class Bot @Autowired constructor(
                 UserState.AWAITING_URL -> handleAddCommand(this, update, message, requestRepository)
                 UserState.AWAITING_DELETE_INDEX -> handleDeleteCommand(this, update, message, requestRepository)
                 UserState.AWAITING_STOP_CONFIRMATION -> handleStopCommand(this, update, message, requestRepository)
+                UserState.AWAITING_POSTPONE_TIME -> handlePostponeCommand(this, update, message, requestRepository)
                 else -> {
                     val command = Commands.fromString(messageText)
                     if (command != null) {
@@ -65,6 +66,7 @@ class Bot @Autowired constructor(
             Commands.DELETE -> handleDeleteCommand(this, update, message, requestRepository)
             Commands.STOP -> handleStopCommand(this, update, message, requestRepository)
             Commands.LIST -> handleListCommand(this, message, requestRepository)
+            Commands.POSTPONE -> handlePostponeCommand(this,update, message, requestRepository)
             Commands.EXE -> if (schedulerConfiguration.enabledExeCommand) handleExeCommand(
                 this, message, scheduler
             )

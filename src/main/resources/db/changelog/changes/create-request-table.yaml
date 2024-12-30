@@ -24,3 +24,16 @@ databaseChangeLog:
                   type: text
                   constraints:
                     nullable: false
+  - changeSet:
+      id: add-postpone-time-column
+      author: andre-carbajal
+      comment: Add postpone_time column to request table
+      changes:
+        - addColumn:
+            tableName: request
+            columns:
+              - column:
+                  name: postpone_date
+                  type: date
+                  constraints:
+                    nullable: true

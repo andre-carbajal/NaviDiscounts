@@ -6,6 +6,7 @@ import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
 import net.andrecarbajal.telegramdiscountsbot.util.Util
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
+import java.time.LocalDate
 
 internal fun handleStartCommand(bot: Bot, message: SendMessage, schedulerConfiguration: SchedulerConfiguration) {
     val enableExeCommand = schedulerConfiguration.enabledExeCommand
@@ -125,5 +126,36 @@ internal fun handleStopCommand(
             "\uD83D\uDEA8 Are you sure you want to stop and delete all requests?\n\uD83D\uDC47 Please type 'OK' to confirm."
         )
         bot.userStates[chatId] = Bot.UserState.AWAITING_STOP_CONFIRMATION
+    }
+}
+
+internal fun handlePostponeCommand(bot: Bot,update: Update, message: SendMessage, requestRepository: RequestRepository){
+    val chatId = message.chatId.toLong()
+    val userState = bot.userStates[chatId]
+
+    if (userState == Bot.UserState.AWAITING_POSTPONE_TIME) {
+        val numberOfDays = update.message.text.toIntOrNull()
+        if (numberOfDays == 0){
+            val allRequest: List<Request> = requestRepository.findAllByChatId(chatId)
+            allRequest.forEach {
+                it.postponeDate = null
+                requestRepository.save(it)
+            }
+            bot.sendMessage(chatId, "\u26D4 Your requests are no longer suspended.")
+        } else if (numberOfDays == null || numberOfDays < 0) {
+            bot.sendMessage(chatId, "\uD83D\uDEAB Invalid number of days. Please execute the command again and enter a valid number of days.")
+        } else {
+            val date: LocalDate = LocalDate.now().plusDays(numberOfDays.toLong())
+            val allRequest: List<Request> = requestRepository.findAllByChatId(chatId)
+            allRequest.forEach {
+                it.postponeDate = date
+                requestRepository.save(it)
+            }
+            bot.sendMessage(chatId, "\u23F3 All your requests will be postponed until $date.")
+        }
+        bot.userStates.remove(chatId)
+    } else {
+        bot.sendMessage(chatId, "\uD83D\uDC47 Please enter the number of days that messages will be postponed.")
+        bot.userStates[chatId] = Bot.UserState.AWAITING_POSTPONE_TIME
     }
 }

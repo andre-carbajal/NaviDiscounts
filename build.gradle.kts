@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "net.andrecarbajal"
-version = "1.5.1"
+version = "1.6"
 
 java {
     toolchain {

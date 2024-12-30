@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 import java.time.Duration
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -62,8 +63,15 @@ class Scheduler @Autowired constructor(
     }
 
     fun sendMessagesToAllUsers() {
-        val requests = requestRepository.findAll()
+        val now = LocalDate.now()
+        val requests = requestRepository.findAll().filter { it.postponeDate == null || it.postponeDate!!.isBefore(now) || it.postponeDate!!.isEqual(now) }
+
         requests.forEach { request ->
+            if (request.postponeDate != null && (request.postponeDate!!.isBefore(now) || request.postponeDate!!.isEqual(now))) {
+                request.postponeDate = null
+                requestRepository.save(request)
+            }
+
             val url = request.url
             val chatId = request.chatId
             val data = when {

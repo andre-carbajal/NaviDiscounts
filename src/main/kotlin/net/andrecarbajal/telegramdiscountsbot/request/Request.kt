@@ -1,21 +1,18 @@
 package net.andrecarbajal.telegramdiscountsbot.request
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 
 @Entity
 @Table(name = "request")
 data class Request(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
     @JoinColumn(name = "chat_id") val chatId: Long = 0,
-    val url: String = " "
+    val url: String = " ",
+    @JoinColumn(name = "postpone_date") var postponeDate : LocalDate? = null
 )
 
 @EnableJpaRepositories
