@@ -1,13 +1,13 @@
 plugins {
-    kotlin("jvm") version "2.0.20"
-    kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.3.5"
-    id("io.spring.dependency-management") version "1.1.6"
-    kotlin("plugin.jpa") version "1.9.25"
+    kotlin("jvm") version "2.1.0"
+    kotlin("plugin.spring") version "2.1.0"
+    id("org.springframework.boot") version "3.4.1"
+    id("io.spring.dependency-management") version "1.1.7"
+    kotlin("plugin.jpa") version "2.1.0"
 }
 
 group = "net.andrecarbajal"
-version = "1.6"
+version = "1.7"
 
 java {
     toolchain {
@@ -29,18 +29,19 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.liquibase:liquibase-core")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    implementation("javax.xml.bind:jaxb-api:2.3.1")
-    implementation("org.glassfish.jaxb:jaxb-runtime:2.3.1")
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
     implementation("org.telegram:telegrambots:6.9.7.1")
-    implementation("org.seleniumhq.selenium:selenium-java:4.27.0")
-    implementation("org.jsoup:jsoup:1.18.2")
+    implementation("org.seleniumhq.selenium:selenium-java:4.28.0")
+    implementation("org.jsoup:jsoup:1.18.3")
 }
 
 kotlin {

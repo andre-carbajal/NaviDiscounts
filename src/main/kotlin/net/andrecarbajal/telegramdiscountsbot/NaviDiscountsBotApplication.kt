@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.ApplicationContext
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RestController
 import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
 
@@ -31,5 +34,13 @@ fun main(args: Array<String>) {
 
     } catch (e: Exception) {
         logger.error("Error while starting the bot", e)
+    }
+}
+
+@RestController
+class BotController{
+    @GetMapping("/health")
+    fun getHealth(): ResponseEntity<String> {
+        return ResponseEntity.ok("Bot is running!")
     }
 }
