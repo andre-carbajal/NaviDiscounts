@@ -5,23 +5,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: navi_discounts
+    container_name: navi_discounts_app
     restart: unless-stopped
     environment:
-       - TELEGRAM_BOT_TOKEN=7529538708:AAEYPUEpgdbE-LbC19S9JVqW11SCkFEgfxk
-       - DB_HOST=postgres
+       - TELEGRAM_BOT_TOKEN=your_token
+       - DB_HOST=nd_db
        - DB_PORT=5432
        - DB_NAME=navi_discounts
        - DATASOURCE_USERNAME=postgres
        - DATASOURCE_PASSWORD=postgres
+    ports:
+      - "8081:8080"
     depends_on:
-      - postgres
+      - nd_db
     networks:
       - backend
 
-  postgres:
+  nd_db:
     image: postgres:latest
-    container_name: postgres
+    container_name: navi_discounts_db
     restart: unless-stopped
     environment:
       POSTGRES_DB: navi_discounts
@@ -32,6 +34,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
