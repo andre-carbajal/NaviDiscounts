@@ -1,0 +1,70 @@
+# Version control
+.git/
+.gitignore
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build outputs and development artifacts
+build/
+dist/
+out/
+logs/
+debug/
+*.log
+
+# Test files and directories
+test/
+tests/
+
+# Temporary and local files
+tmp/
+temp/
+*.tmp
+.local/
+local/
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# Documentation
+README*
+*.md
+docs/
+
+# Docker and Compose files
+Dockerfile*
+docker-compose*
+
+# Kotlin/Java/Gradle specific
+.gradle/
+*.class
+*.jar
+
+# Gradle wrapper files (do NOT ignore gradlew/gradlew.bat)
+# (Explicitly not ignoring gradlew and gradlew.bat as per instructions)
+
+# Miscellaneous
+*.bat
+
+# Exclude project-specific directories that should not be in the image
+.github/
+.kotlin/
+
+# Exclude files with no extension that are not needed (if any)
+# (No specific pattern, but can be added if needed)
+
+# Exclude XML and YAML files outside of src/main/resources (if not needed)
+# (Assume only resources in src/main/resources are needed)
+
+# Exclude gradle wrapper jar and properties (already in .gradle/)
+gradle/

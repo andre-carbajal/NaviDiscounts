@@ -49,7 +49,7 @@ class Scheduler @Autowired constructor(
         val initialDelay = duration.toSeconds()
 
         scheduler.scheduleAtFixedRate(
-            Runnable {
+            {
                 run {
                     try {
                         logger.info("Send messages to all users task is running")
@@ -64,10 +64,14 @@ class Scheduler @Autowired constructor(
 
     fun sendMessagesToAllUsers() {
         val now = LocalDate.now()
-        val requests = requestRepository.findAll().filter { it.postponeDate == null || it.postponeDate!!.isBefore(now) || it.postponeDate!!.isEqual(now) }
+        val requests = requestRepository.findAll()
+            .filter { it.postponeDate == null || it.postponeDate!!.isBefore(now) || it.postponeDate!!.isEqual(now) }
 
         requests.forEach { request ->
-            if (request.postponeDate != null && (request.postponeDate!!.isBefore(now) || request.postponeDate!!.isEqual(now))) {
+            if (request.postponeDate != null && (request.postponeDate!!.isBefore(now) || request.postponeDate!!.isEqual(
+                    now
+                ))
+            ) {
                 request.postponeDate = null
                 requestRepository.save(request)
             }

@@ -1,13 +1,13 @@
 plugins {
-    kotlin("jvm") version "2.1.0"
-    kotlin("plugin.spring") version "2.1.0"
-    id("org.springframework.boot") version "3.4.1"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.spring") version "2.1.20"
+    id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.jpa") version "2.1.0"
+    kotlin("plugin.jpa") version "2.1.20"
 }
 
 group = "net.andrecarbajal"
-version = "1.7"
+version = "1.8"
 
 java {
     toolchain {
@@ -40,8 +40,8 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
     implementation("org.telegram:telegrambots:6.9.7.1")
-    implementation("org.seleniumhq.selenium:selenium-java:4.28.0")
-    implementation("org.jsoup:jsoup:1.18.3")
+    implementation("org.seleniumhq.selenium:selenium-java:4.31.0")
+    implementation("org.jsoup:jsoup:1.19.1")
 }
 
 kotlin {

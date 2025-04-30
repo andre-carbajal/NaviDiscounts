@@ -1,2 +1,1 @@
-- Update some dependencies 
-- Health controller added
+- Update some dependencies

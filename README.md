@@ -24,6 +24,10 @@ NaviDiscounts is a telegram bot that helps you find discounts on your favorite p
 - `/stop` - Stop receiving product information and delete all added products.
 - `/exe` - Execute the [scheduler](src/main/kotlin/net/andrecarbajal/telegramdiscountsbot/bot/Scheduler.kt).
 
+## Endpoints
+
+- `/health` - Check if the bot is running.
+
 ## How to build
 
 ### Production mode
@@ -53,6 +57,46 @@ Run the project in development mode with the following command:
     --spring.bot.scheduler.executionTime={EXECUTION_TIME:00:00}
    ```
 
+## Running with Docker
+
+You can run NaviDiscounts and its required PostgreSQL database using Docker Compose. This project provides a
+`Dockerfile` (using Gradle 8.10.2 and JDK 17) and a `docker-compose.yml` for easy setup.
+
+### Requirements
+
+- Docker and Docker Compose installed
+
+### Environment Variables
+
+The following environment variables are required for the bot to function. You can set them in a `.env` file or directly
+in the `docker-compose.yml` under the `environment` section:
+
+- `TELEGRAM_BOT_TOKEN` - Your Telegram bot token
+- `DB_HOST` - Database host (default: `postgres`)
+- `DB_PORT` - Database port (default: `5432`)
+- `DB_NAME` - Database name (default: `navi_discounts`)
+- `DATASOURCE_USERNAME` - Database username (default: `postgres`)
+- `DATASOURCE_PASSWORD` - Database password (default: `postgres`)
+
+The PostgreSQL service uses the following variables (with defaults):
+
+- `POSTGRES_DB=navi_discounts`
+- `POSTGRES_USER=postgres`
+- `POSTGRES_PASSWORD=postgres`
+
+### Build and Run
+
+To build and start the services, run:
+
+```bash
+docker compose up --build
+```
+
+This will build the Kotlin application and start both the bot and a PostgreSQL database. The application will wait for
+the database to be ready before starting.
+
+- Data for PostgreSQL is persisted in a Docker volume (`pgdata`).
+
 ## how to use
 
 1. Add the bot to your telegram account
@@ -60,7 +104,7 @@ Run the project in development mode with the following command:
 3. Send the command `/add` to the bot
 4. Send the URL of the product you want to track
 5. Wait for the bot to send you a message with the discount information
-6. If you want a command to execute the scheduler, you can enable it withe the `enabledExeCommand` parameter
+6. If you want a command to execute the scheduler, you can enable it with the `enabledExeCommand` parameter
 7. Enjoy!
 
 ## Contributions

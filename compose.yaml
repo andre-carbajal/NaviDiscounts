@@ -1,0 +1,45 @@
+name: Navi Discounts
+
+services:
+  kotlin-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: navi_discounts
+    restart: unless-stopped
+    environment:
+       - TELEGRAM_BOT_TOKEN=7529538708:AAEYPUEpgdbE-LbC19S9JVqW11SCkFEgfxk
+       - DB_HOST=postgres
+       - DB_PORT=5432
+       - DB_NAME=navi_discounts
+       - DATASOURCE_USERNAME=postgres
+       - DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - postgres
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: navi_discounts
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  pgdata:
