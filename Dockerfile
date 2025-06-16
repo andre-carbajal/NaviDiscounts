@@ -18,12 +18,12 @@ RUN apt-get update && apt-get install -y \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.35.0/geckodriver-v0.35.0-linux64.tar.gz \
-    && tar -xvzf geckodriver-v0.35.0-linux64.tar.gz \
+RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz \
+    && tar -xvzf geckodriver-v0.36.0-linux64.tar.gz \
     && mv geckodriver /usr/bin/geckodriver \
     && chown root:root /usr/bin/geckodriver \
     && chmod +x /usr/bin/geckodriver \
-    && rm geckodriver-v0.35.0-linux64.tar.gz
+    && rm geckodriver-v0.36.0-linux64.tar.gz
 
 WORKDIR /app
 

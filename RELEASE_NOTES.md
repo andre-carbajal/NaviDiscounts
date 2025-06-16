@@ -1,1 +1,1 @@
-- Update some dependencies
+- Update geckodriver to version 0.36.0 in Dockerfile
