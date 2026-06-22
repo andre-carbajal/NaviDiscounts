@@ -1,9 +1,9 @@
 plugins {
-    kotlin("jvm") version "2.1.20"
-    kotlin("plugin.spring") version "2.1.20"
-    id("org.springframework.boot") version "3.4.5"
+    kotlin("jvm") version "2.4.0"
+    kotlin("plugin.spring") version "2.4.0"
+    id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.jpa") version "2.1.20"
+    kotlin("plugin.jpa") version "2.4.0"
 }
 
 group = "net.andrecarbajal"
@@ -11,7 +11,7 @@ version = "1.8"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -36,12 +36,14 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("com.h2database:h2")
     implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
-    implementation("org.telegram:telegrambots:6.9.7.1")
-    implementation("org.seleniumhq.selenium:selenium-java:4.31.0")
-    implementation("org.jsoup:jsoup:1.19.1")
+    implementation("org.telegram:telegrambots-longpolling:10.0.0")
+    implementation("org.telegram:telegrambots-client:10.0.0@jar")
+    implementation("org.seleniumhq.selenium:selenium-java:4.45.0")
+    implementation("org.jsoup:jsoup:1.22.2")
 }
 
 kotlin {

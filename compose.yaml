@@ -17,12 +17,13 @@ services:
     ports:
       - "8081:8080"
     depends_on:
-      - nd_db
+      nd_db:
+        condition: service_healthy
     networks:
       - backend
 
   nd_db:
-    image: postgres:latest
+    image: postgres:17-alpine
     container_name: navi_discounts_db
     restart: unless-stopped
     environment:

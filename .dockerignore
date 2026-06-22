@@ -66,5 +66,8 @@ docker-compose*
 # Exclude XML and YAML files outside of src/main/resources (if not needed)
 # (Assume only resources in src/main/resources are needed)
 
-# Exclude gradle wrapper jar and properties (already in .gradle/)
-gradle/
+# Keep Gradle wrapper files so Docker builds use the pinned wrapper version.
+!gradle/
+!gradle/wrapper/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties

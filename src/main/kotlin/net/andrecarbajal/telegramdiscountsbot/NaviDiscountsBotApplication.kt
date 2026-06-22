@@ -10,8 +10,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
-import org.telegram.telegrambots.meta.TelegramBotsApi
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
+import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication
 
 @SpringBootApplication
 @EnableConfigurationProperties(
@@ -25,12 +24,12 @@ fun main(args: Array<String>) {
     val logger: Logger = LoggerFactory.getLogger(NaviDiscountsBotApplication::class.java)
     val context: ApplicationContext = runApplication<NaviDiscountsBotApplication>(*args)
 
-    val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
+    val botsApplication = TelegramBotsLongPollingApplication()
 
     try {
         val bot = context.getBean(Bot::class.java)
-        botsApi.registerBot(bot)
-        logger.info("Bot is running!")
+        botsApplication.registerBot(bot.botToken, bot)
+        logger.info("Bot ${bot.botUsername} is running!")
 
     } catch (e: Exception) {
         logger.error("Error while starting the bot", e)

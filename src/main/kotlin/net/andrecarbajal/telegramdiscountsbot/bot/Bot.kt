@@ -6,13 +6,14 @@ import net.andrecarbajal.telegramdiscountsbot.TelegramBotConfiguration
 import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import org.telegram.telegrambots.bots.TelegramLongPollingBot
+import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient
+import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto
 import org.telegram.telegrambots.meta.api.objects.InputFile
 import org.telegram.telegrambots.meta.api.objects.Update
+import org.telegram.telegrambots.meta.generics.TelegramClient
 
-@Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 @Service
 class Bot @Autowired constructor(
     private val requestRepository: RequestRepository,
@@ -20,14 +21,14 @@ class Bot @Autowired constructor(
     private val applicationConfiguration: ApplicationConfiguration,
     private val telegramBotConfiguration: TelegramBotConfiguration,
     private val schedulerConfiguration: SchedulerConfiguration
-) : TelegramLongPollingBot() {
-    override fun getBotUsername(): String? {
-        return applicationConfiguration.name
-    }
+) : LongPollingSingleThreadUpdateConsumer {
+    private val telegramClient: TelegramClient = OkHttpTelegramClient(botToken)
 
-    override fun getBotToken(): String? {
-        return telegramBotConfiguration.token
-    }
+    val botUsername: String
+        get() = applicationConfiguration.name
+
+    val botToken: String
+        get() = telegramBotConfiguration.token
 
     val userStates = mutableMapOf<Long, UserState>()
 
@@ -35,12 +36,12 @@ class Bot @Autowired constructor(
         AWAITING_URL, AWAITING_DELETE_INDEX, AWAITING_STOP_CONFIRMATION, AWAITING_POSTPONE_TIME, NONE
     }
 
-    override fun onUpdateReceived(update: Update?) {
-        if (update?.hasMessage() == true && update.message.hasText()) {
+    override fun consume(update: Update) {
+        if (update.hasMessage() && update.message.hasText()) {
             val messageText = update.message.text
             val chatId = update.message.chatId
 
-            val message = SendMessage().apply { setChatId(chatId) }
+            val message = SendMessage(chatId.toString(), "")
 
             val userState = userStates[chatId] ?: UserState.NONE
 
@@ -66,7 +67,7 @@ class Bot @Autowired constructor(
             Commands.DELETE -> handleDeleteCommand(this, update, message, requestRepository)
             Commands.STOP -> handleStopCommand(this, update, message, requestRepository)
             Commands.LIST -> handleListCommand(this, message, requestRepository)
-            Commands.POSTPONE -> handlePostponeCommand(this,update, message, requestRepository)
+            Commands.POSTPONE -> handlePostponeCommand(this, update, message, requestRepository)
             Commands.EXE -> if (schedulerConfiguration.enabledExeCommand) handleExeCommand(
                 this, message, scheduler
             )
@@ -74,22 +75,18 @@ class Bot @Autowired constructor(
     }
 
     fun sendMessage(chatId: Long, text: String) {
-        val message = SendMessage().apply {
-            setChatId(chatId)
-            setText(text)
+        val message = SendMessage(chatId.toString(), text).apply {
             enableMarkdown(true)
         }
-        execute(message)
+        telegramClient.execute(message)
     }
 
     fun sendPhotoMessage(chatId: Long, caption: String, photo_url: String) {
         val inputFile = InputFile(photo_url)
-        val sendPhoto = SendPhoto().apply {
-            setChatId(chatId)
-            setPhoto(inputFile)
+        val sendPhoto = SendPhoto(chatId.toString(), inputFile).apply {
             setCaption(caption)
             parseMode = "Markdown"
         }
-        execute(sendPhoto)
+        telegramClient.execute(sendPhoto)
     }
 }

@@ -2,6 +2,7 @@ package net.andrecarbajal.telegramdiscountsbot.util
 
 import net.andrecarbajal.telegramdiscountsbot.scrapping.Websites
 import java.net.MalformedURLException
+import org.springframework.core.env.Environment
 import java.net.URI
 import java.net.URISyntaxException
 
@@ -35,6 +36,10 @@ object Util {
         } catch (_: URISyntaxException) {
             true
         }
+    }
+
+    fun isDevelopment(environment: Environment): Boolean {
+        return environment.activeProfiles.contains("dev")
     }
 
     fun boldString(text: String): String {

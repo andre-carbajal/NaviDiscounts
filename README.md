@@ -60,10 +60,11 @@ Run the project in development mode with the following command:
 ## Running with Docker
 
 You can run NaviDiscounts and its required PostgreSQL database using Docker Compose. This project provides a
-`Dockerfile` (using Gradle 8.10.2 and JDK 17) and a `docker-compose.yml` for easy setup.
+`Dockerfile` (using Gradle 9.6.0 and JDK 25) and a `docker-compose.yml` for easy setup.
 
 ### Requirements
 
+- Java 25 for local builds/runs
 - Docker and Docker Compose installed
 
 ### Environment Variables
