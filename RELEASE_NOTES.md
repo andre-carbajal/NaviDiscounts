@@ -1,1 +1,6 @@
-- Update geckodriver to version 0.36.0 in Dockerfile
+- Replace Selenium/Firefox scraping with JSON API product lookups.
+- Support numeric and alphanumeric product IDs, including pack IDs such as `PACKFC58`.
+- Detect offers from `priceHighDiscount`, `priceWithpaymentMethod`, and `priceAllPaymentMethod`.
+- Add Liquibase startup migrations for the `request` table.
+- Improve Docker runtime by removing Firefox/geckodriver and adding explicit DNS configuration.
+- Add Telegram startup validation, HTTP timeouts, and scraper/repository tests.
