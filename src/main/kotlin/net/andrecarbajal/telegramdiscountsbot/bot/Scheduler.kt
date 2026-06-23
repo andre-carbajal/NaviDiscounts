@@ -19,7 +19,6 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-@Suppress("UNUSED")
 @Component
 class Scheduler @Autowired constructor(
     @Lazy private var bot: Bot,
@@ -68,31 +67,37 @@ class Scheduler @Autowired constructor(
             .filter { it.postponeDate == null || it.postponeDate!!.isBefore(now) || it.postponeDate!!.isEqual(now) }
 
         requests.forEach { request ->
-            if (request.postponeDate != null && (request.postponeDate!!.isBefore(now) || request.postponeDate!!.isEqual(
-                    now
-                ))
-            ) {
-                request.postponeDate = null
-                requestRepository.save(request)
-            }
-
-            val url = request.url
-            val chatId = request.chatId
-            val data = when {
-                url.contains(Websites.MIFARMA.url) -> scrappingMifarma(url)
-                url.contains(Websites.INKA_FARMA.url) -> scrappingInkaFarma(url)
-                else -> null
-            }
-            if (data != null) {
-                if (data[3] != null) {
-                    if (data[4] != null) {
-                        bot.sendPhotoMessage(chatId, parseMessageText(data, url), data[4]!!)
-                    } else {
-                        bot.sendMessage(chatId, parseMessageText(data, url))
-                    }
+            try {
+                if (request.postponeDate != null && (request.postponeDate!!.isBefore(now) || request.postponeDate!!.isEqual(
+                        now
+                    ))
+                ) {
+                    request.postponeDate = null
+                    requestRepository.save(request)
                 }
-            } else {
-                logger.warn("Scraping result is null")
+
+                val url = request.url
+                val chatId = request.chatId
+                val data = when {
+                    url.contains(Websites.MIFARMA.url) -> scrappingMifarma(url)
+                    url.contains(Websites.INKA_FARMA.url) -> scrappingInkaFarma(url)
+                    else -> null
+                }
+                if (data != null) {
+                    if (data[3] != null) {
+                        if (data[4] != null) {
+                            bot.sendPhotoMessage(chatId, parseMessageText(data, url), data[4]!!)
+                        } else {
+                            bot.sendMessage(chatId, parseMessageText(data, url))
+                        }
+                    } else {
+                        logger.info("Skipping notification because product has no offer url={}", url)
+                    }
+                } else {
+                    logger.warn("Scraping result is null url={}", url)
+                }
+            } catch (e: Exception) {
+                logger.error("Error processing request id={} url={}", request.id, request.url, e)
             }
         }
     }

@@ -8,10 +8,10 @@ import java.time.LocalDate
 
 @Entity
 @Table(name = "request")
-data class Request(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
-    @JoinColumn(name = "chat_id") val chatId: Long = 0,
-    val url: String = " ",
+class Request(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long = 0,
+    @JoinColumn(name = "chat_id") var chatId: Long = 0,
+    var url: String = " ",
     @JoinColumn(name = "postpone_date") var postponeDate : LocalDate? = null
 )
 

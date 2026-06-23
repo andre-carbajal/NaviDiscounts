@@ -5,10 +5,11 @@ NaviDiscounts is a telegram bot that helps you find discounts on your favorite p
 ## Technologies
 
 - [Kotlin](https://kotlinlang.org/)
+- [Spring Boot](https://spring.io/projects/spring-boot/)
 - [Java Telegram](https://github.com/rubenlagus/TelegramBots)
 - [PostgreSQL](https://www.postgresql.org/)
-- [Jsoup](https://jsoup.org/)
-- [Selenium](https://www.selenium.dev/)
+- [Liquibase](https://www.liquibase.com/)
+- Java HTTP Client for product API calls
 
 ## Supported Websites
 
@@ -60,7 +61,7 @@ Run the project in development mode with the following command:
 ## Running with Docker
 
 You can run NaviDiscounts and its required PostgreSQL database using Docker Compose. This project provides a
-`Dockerfile` (using Gradle 9.6.0 and JDK 25) and a `docker-compose.yml` for easy setup.
+`Dockerfile` (using Gradle 9.6.0 and JDK 25) and a `compose.yaml` for easy setup.
 
 ### Requirements
 
@@ -69,8 +70,8 @@ You can run NaviDiscounts and its required PostgreSQL database using Docker Comp
 
 ### Environment Variables
 
-The following environment variables are required for the bot to function. You can set them in a `.env` file or directly
-in the `docker-compose.yml` under the `environment` section:
+The following environment variables are required for the bot to function. You can set them in a `.env` file. The
+application reads that file at startup when running locally, and Docker Compose also uses it for service variables:
 
 - `TELEGRAM_BOT_TOKEN` - Your Telegram bot token
 - `DB_HOST` - Database host (default: `postgres`)
@@ -85,18 +86,31 @@ The PostgreSQL service uses the following variables (with defaults):
 - `POSTGRES_USER=postgres`
 - `POSTGRES_PASSWORD=postgres`
 
+Liquibase runs automatically on startup and creates/updates the required tables, including `request`.
+
 ### Build and Run
 
 To build and start the services, run:
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
 This will build the Kotlin application and start both the bot and a PostgreSQL database. The application will wait for
 the database to be ready before starting.
 
 - Data for PostgreSQL is persisted in a Docker volume (`pgdata`).
+- The app service uses explicit DNS servers (`8.8.8.8`, `1.1.1.1`) to avoid Docker/Tailscale DNS issues with
+  `api.telegram.org`.
+- The runtime image does not install Firefox, geckodriver, Selenium, or Jsoup.
+
+Useful checks:
+
+```bash
+docker compose logs -f kotlin-app
+docker compose exec kotlin-app nslookup api.telegram.org
+docker compose exec kotlin-app ps -eo pid,stat,comm | grep -E 'firefox|geckodriver' || true
+```
 
 ## how to use
 
@@ -107,6 +121,8 @@ the database to be ready before starting.
 5. Wait for the bot to send you a message with the discount information
 6. If you want a command to execute the scheduler, you can enable it with the `enabledExeCommand` parameter
 7. Enjoy!
+
+If a product is not notified, check the logs. The scheduler skips products that do not have a valid offer price.
 
 ## Contributions
 

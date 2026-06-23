@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: dev
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
 
 ---
 spring:
@@ -19,6 +21,9 @@ spring:
       enabledExeCommand: ${ENABLED_EXE_COMMAND:true}
       timeZone: ${TIME_ZONE:UTC}
       executionTime: ${EXECUTION_TIME:00:00}
+logging:
+  level:
+    root: info
 
 ---
 spring:
@@ -37,3 +42,6 @@ spring:
       enabledExeCommand: ${ENABLED_EXE_COMMAND:false}
       timeZone: ${TIME_ZONE:UTC}
       executionTime: ${EXECUTION_TIME:00:00}
+logging:
+  level:
+    root: warn

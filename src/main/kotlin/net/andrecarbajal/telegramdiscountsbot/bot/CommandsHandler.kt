@@ -25,7 +25,7 @@ internal fun handleListCommand(bot: Bot, message: SendMessage, requestRepository
     if (allRequest.isEmpty()) {
         bot.sendMessage(message.chatId.toLong(), "\u26A0 You have no requests.")
     } else {
-        var textList = allRequest.mapIndexed { index, request -> "${index + 1}. ${request.url}" }
+        val textList = allRequest.mapIndexed { index, request -> "${index + 1}. ${request.url}" }
             .joinToString(separator = "\n", prefix = "${Util.boldString("\uD83D\uDCDC Your request list:")}\n")
         bot.sendMessage(message.chatId.toLong(), textList)
     }
@@ -129,13 +129,18 @@ internal fun handleStopCommand(
     }
 }
 
-internal fun handlePostponeCommand(bot: Bot,update: Update, message: SendMessage, requestRepository: RequestRepository){
+internal fun handlePostponeCommand(
+    bot: Bot,
+    update: Update,
+    message: SendMessage,
+    requestRepository: RequestRepository
+) {
     val chatId = message.chatId.toLong()
     val userState = bot.userStates[chatId]
 
     if (userState == Bot.UserState.AWAITING_POSTPONE_TIME) {
         val numberOfDays = update.message.text.toIntOrNull()
-        if (numberOfDays == 0){
+        if (numberOfDays == 0) {
             val allRequest: List<Request> = requestRepository.findAllByChatId(chatId)
             allRequest.forEach {
                 it.postponeDate = null
@@ -143,7 +148,10 @@ internal fun handlePostponeCommand(bot: Bot,update: Update, message: SendMessage
             }
             bot.sendMessage(chatId, "\u26D4 Your requests are no longer suspended.")
         } else if (numberOfDays == null || numberOfDays < 0) {
-            bot.sendMessage(chatId, "\uD83D\uDEAB Invalid number of days. Please execute the command again and enter a valid number of days.")
+            bot.sendMessage(
+                chatId,
+                "\uD83D\uDEAB Invalid number of days. Please execute the command again and enter a valid number of days."
+            )
         } else {
             val date: LocalDate = LocalDate.now().plusDays(numberOfDays.toLong())
             val allRequest: List<Request> = requestRepository.findAllByChatId(chatId)

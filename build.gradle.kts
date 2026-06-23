@@ -28,7 +28,7 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.liquibase:liquibase-core")
+    implementation("org.springframework.boot:spring-boot-starter-liquibase")
     implementation("org.springframework.boot:spring-boot-starter-web")
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql")
@@ -42,8 +42,6 @@ dependencies {
 
     implementation("org.telegram:telegrambots-longpolling:10.0.0")
     implementation("org.telegram:telegrambots-client:10.0.0@jar")
-    implementation("org.seleniumhq.selenium:selenium-java:4.45.0")
-    implementation("org.jsoup:jsoup:1.22.2")
 }
 
 kotlin {

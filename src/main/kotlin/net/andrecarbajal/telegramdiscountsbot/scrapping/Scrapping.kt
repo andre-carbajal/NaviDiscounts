@@ -1,72 +1,160 @@
 package net.andrecarbajal.telegramdiscountsbot.scrapping
 
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.openqa.selenium.By
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.firefox.FirefoxOptions
-import org.openqa.selenium.support.ui.ExpectedConditions
-import org.openqa.selenium.support.ui.WebDriverWait
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.math.BigDecimal
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.time.Duration
 
 private val logger: Logger = LoggerFactory.getLogger("Scrapping")
 
-private fun scrapeWebsite(
-    url: String, nameCssSelector: String, priceCssSelector: String, offerCssSelector: String
-): List<String?>? {
-    val imageCssSelector = "img.ngxImageZoomThumbnail"
+private const val MIFARMA_API_BASE = "https://5doa19p9r7.execute-api.us-east-1.amazonaws.com/MMMFPRD/product"
+private const val INKAFARMA_API_BASE = "https://5doa19p9r7.execute-api.us-east-1.amazonaws.com/MMPROD/product"
+private val httpTimeout: Duration = Duration.ofSeconds(20)
 
-    val options = FirefoxOptions()
-    options.addArguments("--headless")
-    options.addArguments("--no-sandbox")
+private val httpClient: HttpClient = HttpClient.newBuilder()
+    .connectTimeout(httpTimeout)
+    .followRedirects(HttpClient.Redirect.NORMAL)
+    .build()
 
-    val driver: WebDriver = try {
-        FirefoxDriver(options)
-    } catch (e: Exception) {
-        logger.error("Error occurred while creating FirefoxDriver", e)
+private val objectMapper = ObjectMapper()
+
+data class ScrapedProduct(
+    val pharmacy: String,
+    val name: String,
+    val price: String,
+    val offer: String?,
+    val imageUrl: String?
+) {
+    fun toLegacyList(): List<String?> = listOf(pharmacy, name, price, offer, imageUrl)
+}
+
+private enum class Pharmacy(
+    val displayName: String,
+    val apiBaseUrl: String
+) {
+    MIFARMA("Mifarma", MIFARMA_API_BASE),
+    INKAFARMA("Inkafarma", INKAFARMA_API_BASE)
+}
+
+private fun scrapeProduct(url: String, pharmacy: Pharmacy): List<String?>? {
+    val productId = extractProductId(url)
+    if (productId == null) {
+        logger.warn("Could not extract product id for {} url={}", pharmacy.displayName, url)
         return null
     }
 
+    val endpoint = "${pharmacy.apiBaseUrl}/$productId"
     return try {
-        driver.get(url)
+        logger.info(
+            "Fetching product data pharmacy={} productId={} endpoint={}",
+            pharmacy.displayName,
+            productId,
+            endpoint
+        )
+        val request = HttpRequest.newBuilder(URI.create(endpoint))
+            .timeout(httpTimeout)
+            .header("Accept", "application/json")
+            .header("User-Agent", "NaviDiscountsBot/1.0")
+            .GET()
+            .build()
 
-        val waitForImage = WebDriverWait(driver, Duration.ofMinutes(5))
-        waitForImage.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(imageCssSelector)))
+        val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        if (response.statusCode() !in 200..299) {
+            logger.warn(
+                "Product API returned non-success status pharmacy={} productId={} status={} endpoint={}",
+                pharmacy.displayName,
+                productId,
+                response.statusCode(),
+                endpoint
+            )
+            return null
+        }
 
-        val doc: Document = Jsoup.parse(driver.pageSource!!)
-        val name = doc.select(nameCssSelector).firstOrNull()?.text() ?: "Name not found"
-        val price = doc.select(priceCssSelector).firstOrNull()?.text() ?: "Price not found"
-        val offer = doc.select(offerCssSelector).getOrNull(1)?.text()
-        val img = doc.select(imageCssSelector).firstOrNull()?.attr("src")
-
-        listOf(name, price, offer, img)
+        parseProductJson(response.body(), pharmacy.displayName)?.also { product ->
+            if (product.offer == null) {
+                logger.info(
+                    "Product has no offer pharmacy={} productId={} price={} url={}",
+                    pharmacy.displayName,
+                    productId,
+                    product.price,
+                    url
+                )
+            } else {
+                logger.info(
+                    "Product offer found pharmacy={} productId={} price={} offer={} url={}",
+                    pharmacy.displayName,
+                    productId,
+                    product.price,
+                    product.offer,
+                    url
+                )
+            }
+        }?.toLegacyList()
     } catch (e: Exception) {
-        logger.error("Error occurred during scraping", e)
+        logger.error(
+            "Error fetching product data pharmacy={} productId={} endpoint={} url={}",
+            pharmacy.displayName,
+            productId,
+            endpoint,
+            url,
+            e
+        )
         null
-    } finally {
-        driver.quit()
     }
 }
 
-fun scrappingMifarma(url: String): List<String?>? {
-    val result = scrapeWebsite(
-        url,
-        "h1[class\$='mb-0']",
-        "div.col-xs-4.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount",
-        "div.col-xs-4.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount"
-    ) ?: return null
-    return listOf("Mifarma", result[0], result[1], result[2], result[3])
+internal fun parseProductJson(json: String, pharmacy: String): ScrapedProduct? {
+    val root = objectMapper.readTree(json)
+    val name = root.textValue("name") ?: return null.also {
+        logger.warn("Product API response missing name pharmacy={}", pharmacy)
+    }
+    val price = root.decimalValue("price") ?: return null.also {
+        logger.warn("Product API response missing price pharmacy={} productName={}", pharmacy, name)
+    }
+    val offerPrice = root.firstDiscountPrice(price, "priceHighDiscount", "priceWithpaymentMethod", "priceAllPaymentMethod")
+    val imageUrl = root.path("imageList")
+        .takeIf { it.isArray && it.size() > 0 }
+        ?.get(0)
+        ?.textValue("url")
+
+    return ScrapedProduct(
+        pharmacy = pharmacy,
+        name = name,
+        price = formatCurrency(price),
+        offer = offerPrice?.let { formatCurrency(it) },
+        imageUrl = imageUrl
+    )
 }
 
-fun scrappingInkaFarma(url: String): List<String?>? {
-    val result = scrapeWebsite(
-        url,
-        "div[class\$='product-detail-information']",
-        "div[class*='col-lg-4']",
-        "div.col-xs-5.col-sm-2.col-md-6.col-lg-4.text-right.d-flex.align-items-center.justify-content-end.price-amount"
-    ) ?: return null
-    return listOf("Inkafarma", result[0], result[1], result[2], result[3])
+internal fun extractProductId(url: String): String? {
+    val path = runCatching { URI.create(url).path }.getOrNull() ?: return null
+    return path.trimEnd('/')
+        .substringAfterLast('/', missingDelimiterValue = "")
+        .takeIf { it.matches(Regex("[A-Za-z0-9]+")) }
 }
+
+private fun JsonNode.firstDiscountPrice(price: BigDecimal, vararg fieldNames: String): BigDecimal? = fieldNames
+    .asSequence()
+    .mapNotNull { decimalValue(it) }
+    .firstOrNull { it > BigDecimal.ZERO && it < price }
+
+private fun JsonNode.decimalValue(fieldName: String): BigDecimal? = path(fieldName)
+    .takeIf { it.isNumber }
+    ?.decimalValue()
+
+private fun JsonNode.textValue(fieldName: String): String? = path(fieldName)
+    .takeUnless { it.isMissingNode || it.isNull }
+    ?.asText()
+    ?.takeIf { it.isNotBlank() }
+
+private fun formatCurrency(value: BigDecimal): String = "S/ ${value.stripTrailingZeros().toPlainString()}"
+
+fun scrappingMifarma(url: String): List<String?>? = scrapeProduct(url, Pharmacy.MIFARMA)
+
+fun scrappingInkaFarma(url: String): List<String?>? = scrapeProduct(url, Pharmacy.INKAFARMA)

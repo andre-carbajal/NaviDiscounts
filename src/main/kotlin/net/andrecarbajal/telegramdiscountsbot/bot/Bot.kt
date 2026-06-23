@@ -4,6 +4,7 @@ import net.andrecarbajal.telegramdiscountsbot.ApplicationConfiguration
 import net.andrecarbajal.telegramdiscountsbot.SchedulerConfiguration
 import net.andrecarbajal.telegramdiscountsbot.TelegramBotConfiguration
 import net.andrecarbajal.telegramdiscountsbot.request.RequestRepository
+import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient
@@ -13,6 +14,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto
 import org.telegram.telegrambots.meta.api.objects.InputFile
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.generics.TelegramClient
+import java.util.concurrent.TimeUnit
 
 @Service
 class Bot @Autowired constructor(
@@ -22,7 +24,13 @@ class Bot @Autowired constructor(
     private val telegramBotConfiguration: TelegramBotConfiguration,
     private val schedulerConfiguration: SchedulerConfiguration
 ) : LongPollingSingleThreadUpdateConsumer {
-    private val telegramClient: TelegramClient = OkHttpTelegramClient(botToken)
+    private val telegramHttpClient = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(20, TimeUnit.SECONDS)
+        .writeTimeout(20, TimeUnit.SECONDS)
+        .callTimeout(30, TimeUnit.SECONDS)
+        .build()
+    private val telegramClient: TelegramClient = OkHttpTelegramClient(telegramHttpClient, botToken)
 
     val botUsername: String
         get() = applicationConfiguration.name
@@ -81,8 +89,8 @@ class Bot @Autowired constructor(
         telegramClient.execute(message)
     }
 
-    fun sendPhotoMessage(chatId: Long, caption: String, photo_url: String) {
-        val inputFile = InputFile(photo_url)
+    fun sendPhotoMessage(chatId: Long, caption: String, photoUrl: String) {
+        val inputFile = InputFile(photoUrl)
         val sendPhoto = SendPhoto(chatId.toString(), inputFile).apply {
             setCaption(caption)
             parseMode = "Markdown"
